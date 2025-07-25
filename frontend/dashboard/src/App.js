@@ -6,7 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ServiceRequestForm from './ServiceRequestForm';
-import { BrowserRouter as Router, Routes, Route, Link as RouterLink, useLocation } from 'react-router-dom';
+import { Routes, Route, Link as RouterLink, useLocation } from 'react-router-dom';
 import InventoryPage from './InventoryPage';
 import Link from '@mui/material/Link';
 
@@ -486,25 +486,29 @@ function AppNavBar() {
   );
 }
 
-function ErrorBoundary({ children }) {
-  const [error, setError] = useState(null);
-
-  if (error) {
-    return (
-      <div style={{ padding: 40, color: 'red' }}>
-        <h2>Something went wrong.</h2>
-        <pre>{error.toString()}</pre>
-      </div>
-    );
+// Add a standard class-based ErrorBoundary
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
   }
-
-  return (
-    <React.Suspense fallback={<div>Loading...</div>}>
-      {React.Children.map(children, child =>
-        React.cloneElement(child, { onError: setError })
-      )}
-    </React.Suspense>
-  );
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    // You can log error info here if needed
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 40, color: 'red' }}>
+          <h2>Something went wrong.</h2>
+          <pre>{this.state.error && this.state.error.toString()}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 function App() {
