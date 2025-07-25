@@ -84,7 +84,7 @@ export default function ServiceRequestForm() {
       mediaIssue.forEach(file => data.append('media_issue', file));
     }
     try {
-      const res = await fetch('http://localhost:8000/public-service-request/', {
+      const res = await fetch('https://adwita-agros.onrender.com/public-service-request/', {
         method: 'POST',
         body: data,
       });

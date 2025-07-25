@@ -65,14 +65,14 @@ function Dashboard() {
 
   // Fetch inventory for dropdowns
   useEffect(() => {
-    fetch('http://localhost:8000/inventory/')
+    fetch('https://adwita-agros.onrender.com/inventory/')
       .then(res => res.json())
       .then(setInventory);
   }, []);
 
   // Fetch parts used for a request
   const fetchParts = (requestId) => {
-    fetch(`http://localhost:8000/service-requests/${requestId}/parts`)
+    fetch(`https://adwita-agros.onrender.com/service-requests/${requestId}/parts`)
       .then(res => res.json())
       .then(data => setParts(prev => ({ ...prev, [requestId]: data })));
   };
@@ -100,8 +100,8 @@ function Dashboard() {
     e.preventDefault();
     const method = partDialog.edit ? 'PUT' : 'POST';
     const url = partDialog.edit
-      ? `http://localhost:8000/service-requests/${partDialog.requestId}/parts/${partDialog.edit.id}`
-      : `http://localhost:8000/service-requests/${partDialog.requestId}/parts`;
+      ? `https://adwita-agros.onrender.com/service-requests/${partDialog.requestId}/parts/${partDialog.edit.id}`
+      : `https://adwita-agros.onrender.com/service-requests/${partDialog.requestId}/parts`;
     await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
@@ -117,12 +117,12 @@ function Dashboard() {
     fetchParts(partDialog.requestId);
     closePartDialog();
     // Refresh inventory
-    fetch('http://localhost:8000/inventory/').then(res => res.json()).then(setInventory);
+    fetch('https://adwita-agros.onrender.com/inventory/').then(res => res.json()).then(setInventory);
   };
   const handlePartDelete = async (requestId, partId) => {
-    await fetch(`http://localhost:8000/service-requests/${requestId}/parts/${partId}`, { method: 'DELETE' });
+    await fetch(`https://adwita-agros.onrender.com/service-requests/${requestId}/parts/${partId}`, { method: 'DELETE' });
     fetchParts(requestId);
-    fetch('http://localhost:8000/inventory/').then(res => res.json()).then(setInventory);
+    fetch('https://adwita-agros.onrender.com/inventory/').then(res => res.json()).then(setInventory);
   };
 
   // Manual add service request dialog
@@ -131,12 +131,12 @@ function Dashboard() {
   const handleAddFormChange = (e) => setAddForm({ ...addForm, [e.target.name]: e.target.value });
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-    await fetch('http://localhost:8000/public-service-request/', {
+    await fetch('https://adwita-agros.onrender.com/public-service-request/', {
       method: 'POST',
       body: new URLSearchParams(addForm)
     });
     setLoading(true);
-    fetch('http://localhost:8000/service-requests/')
+    fetch('https://adwita-agros.onrender.com/service-requests/')
       .then(res => res.json())
       .then(data => {
         setRequests(data);
@@ -146,7 +146,7 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    fetch('http://localhost:8000/service-requests/')
+    fetch('https://adwita-agros.onrender.com/service-requests/')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -172,14 +172,14 @@ function Dashboard() {
   };
 
   const handleEditSave = async () => {
-    await fetch(`http://localhost:8000/service-requests/${editId}`, {
+    await fetch(`https://adwita-agros.onrender.com/service-requests/${editId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editData)
     });
     setEditId(null);
     setLoading(true);
-    fetch('http://localhost:8000/service-requests/')
+    fetch('https://adwita-agros.onrender.com/service-requests/')
       .then(res => res.json())
       .then(data => {
         setRequests(data);
@@ -202,7 +202,7 @@ function Dashboard() {
     const formData = new FormData();
     formData.append("file", csvFile);
     try {
-      const res = await fetch("http://localhost:8000/import-csv/", {
+      const res = await fetch("https://adwita-agros.onrender.com/import-csv/", {
         method: "POST",
         body: formData
       });
@@ -219,7 +219,7 @@ function Dashboard() {
         setCsvUploadMsg("CSV uploaded and database updated successfully.");
         setCsvFile(null);
         setLoading(true);
-        fetch('http://localhost:8000/service-requests/')
+        fetch('https://adwita-agros.onrender.com/service-requests/')
           .then(res => res.json())
           .then(data => {
             setRequests(data);
@@ -339,12 +339,12 @@ function Dashboard() {
                           <TableCell>{r.description}</TableCell>
                           <TableCell>
                             {r.photos && (
-                              <a href={`http://localhost:8000/${r.photos}`} target="_blank" rel="noopener noreferrer">Photo</a>
+                              <a href={`https://adwita-agros.onrender.com/${r.photos}`} target="_blank" rel="noopener noreferrer">Photo</a>
                             )}
                             {r.videos && r.videos.split(',').map((v, i) => (
                               <span key={i}>
                                 {' '}
-                                <a href={`http://localhost:8000/${v}`} target="_blank" rel="noopener noreferrer">Media {i + 1}</a>
+                                <a href={`https://adwita-agros.onrender.com/${v}`} target="_blank" rel="noopener noreferrer">Media {i + 1}</a>
                               </span>
                             ))}
                           </TableCell>

@@ -12,7 +12,7 @@ export default function InventoryPage() {
 
   const fetchItems = () => {
     setLoading(true);
-    fetch('http://localhost:8000/inventory/')
+    fetch('https://adwita-agros.onrender.com/inventory/')
       .then(res => res.json())
       .then(data => {
         setItems(data);
@@ -43,7 +43,7 @@ export default function InventoryPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = editItem ? 'PUT' : 'POST';
-    const url = editItem ? `http://localhost:8000/inventory/${editItem.id}` : 'http://localhost:8000/inventory/';
+    const url = editItem ? `https://adwita-agros.onrender.com/inventory/${editItem.id}` : 'https://adwita-agros.onrender.com/inventory/';
     await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
@@ -60,7 +60,7 @@ export default function InventoryPage() {
 
   const handleDelete = async (id) => {
     if (window.confirm('Delete this item?')) {
-      await fetch(`http://localhost:8000/inventory/${id}`, { method: 'DELETE' });
+      await fetch(`https://adwita-agros.onrender.com/inventory/${id}`, { method: 'DELETE' });
       fetchItems();
     }
   };
