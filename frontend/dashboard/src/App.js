@@ -486,19 +486,40 @@ function AppNavBar() {
   );
 }
 
+function ErrorBoundary({ children }) {
+  const [error, setError] = useState(null);
+
+  if (error) {
+    return (
+      <div style={{ padding: 40, color: 'red' }}>
+        <h2>Something went wrong.</h2>
+        <pre>{error.toString()}</pre>
+      </div>
+    );
+  }
+
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      {React.Children.map(children, child =>
+        React.cloneElement(child, { onError: setError })
+      )}
+    </React.Suspense>
+  );
+}
+
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const location = useLocation();
   const isLoginPage = location.pathname === '/' && !loggedIn;
   return (
-    <>
+    <ErrorBoundary>
       {!isLoginPage && <AppNavBar />}
       <Routes>
         <Route path="/service-request" element={<ServiceRequestForm />} />
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/*" element={loggedIn ? <Dashboard /> : <Login onLogin={() => setLoggedIn(true)} />} />
       </Routes>
-    </>
+    </ErrorBoundary>
   );
 }
 

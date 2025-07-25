@@ -68,3 +68,12 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Deployment Notes for Vercel
+
+- **Build Command:** `npm run build`
+- **Output Directory:** `build`
+- Make sure the `vercel.json` file is present in this directory to handle client-side routing (all routes are rewritten to `index.html`).
+- If you use environment variables, set them in the Vercel dashboard under Project Settings > Environment Variables.
+
+This ensures your React app works correctly with client-side routing and Vercel's static hosting.
