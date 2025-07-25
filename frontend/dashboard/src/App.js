@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, createContext, useContext } from 'react';
 import './App.css';
-import { Button, TextField, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, AppBar, Toolbar, Box, Container, MenuItem, Accordion, AccordionSummary, AccordionDetails, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Button, TextField, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, AppBar, Toolbar, Box, Container, MenuItem, Accordion, AccordionSummary, AccordionDetails, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, CssBaseline } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -9,6 +10,9 @@ import ServiceRequestForm from './ServiceRequestForm';
 import { Routes, Route, Link as RouterLink, useLocation } from 'react-router-dom';
 import InventoryPage from './InventoryPage';
 import Link from '@mui/material/Link';
+import Pagination from '@mui/material/Pagination';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
@@ -18,10 +22,20 @@ function Login({ onLogin }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Simple fake auth: username: admin, password: admin
+    // technician: tech/tech, viewer: view/view
+    let role = null;
     if (username === 'admin' && password === 'admin') {
-      onLogin();
+      role = 'admin';
+    } else if (username === 'tech' && password === 'tech') {
+      role = 'technician';
+    } else if (username === 'view' && password === 'view') {
+      role = 'viewer';
+    }
+    if (role) {
+      localStorage.setItem('role', role);
+      onLogin(role);
     } else {
-      setError('Invalid credentials. Try admin/admin.');
+      setError('Invalid credentials. Try admin/admin, tech/tech, or view/view.');
     }
   };
 
@@ -46,7 +60,7 @@ const TECHNICIANS = [
   { id: 3, name: 'Amit Singh' },
 ];
 
-function Dashboard() {
+function Dashboard({ role, showNotification }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState(null);
@@ -62,6 +76,16 @@ function Dashboard() {
   const [partForm, setPartForm] = useState({ part_code: '', part_name: '', quantity_used: 1 });
   const [addDialog, setAddDialog] = useState(false);
   const [addForm, setAddForm] = useState({ name: '', chassis_number: '', request_type: '', description: '', location: '', alternate_contact: '' });
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 20;
+  const paginatedRequests = requests.filter(r =>
+    (r.ticket_number && r.ticket_number.toLowerCase().includes(search.toLowerCase())) ||
+    (r.description && r.description.toLowerCase().includes(search.toLowerCase())) ||
+    (r.chassis_number && r.chassis_number.toLowerCase().includes(search.toLowerCase())) ||
+    (r.request_type && r.request_type.toLowerCase().includes(search.toLowerCase())) ||
+    (r.request_status && r.request_status.toLowerCase().includes(search.toLowerCase()))
+  ).slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
   // Fetch inventory for dropdowns
   useEffect(() => {
@@ -118,11 +142,13 @@ function Dashboard() {
     closePartDialog();
     // Refresh inventory
     fetch('https://adwita-agros.onrender.com/inventory/').then(res => res.json()).then(setInventory);
+    showNotification('Part updated successfully!', 'success');
   };
   const handlePartDelete = async (requestId, partId) => {
     await fetch(`https://adwita-agros.onrender.com/service-requests/${requestId}/parts/${partId}`, { method: 'DELETE' });
     fetchParts(requestId);
     fetch('https://adwita-agros.onrender.com/inventory/').then(res => res.json()).then(setInventory);
+    showNotification('Part deleted successfully!', 'success');
   };
 
   // Manual add service request dialog
@@ -143,6 +169,7 @@ function Dashboard() {
         setLoading(false);
       });
     closeAddDialog();
+    showNotification('Service request added successfully!', 'success');
   };
 
   useEffect(() => {
@@ -185,6 +212,7 @@ function Dashboard() {
         setRequests(data);
         setLoading(false);
       });
+    showNotification('Service request updated successfully!', 'success');
   };
 
   const handleCsvChange = (e) => {
@@ -213,6 +241,7 @@ function Dashboard() {
         const text = await res.text();
         setCsvUploadMsg(`Upload failed. Server response: ${text}`);
         setCsvUploading(false);
+        showNotification('CSV upload failed.', 'error');
         return;
       }
       if (res.ok && !result.errors) {
@@ -225,16 +254,20 @@ function Dashboard() {
             setRequests(data);
             setLoading(false);
           });
+        showNotification('CSV uploaded successfully!', 'success');
       } else if (result.errors) {
         setCsvUploadMsg(
           `Upload completed with errors. Imported: ${result.imported}. Errors: \n` +
           result.errors.join("\n")
         );
+        showNotification(`CSV uploaded with ${result.errors.length} errors.`, 'warning');
       } else {
         setCsvUploadMsg("Upload failed. Please check your CSV format.");
+        showNotification('CSV upload failed. Please check your CSV format.', 'error');
       }
     } catch (err) {
       setCsvUploadMsg("Error uploading CSV.");
+      showNotification('Error uploading CSV.', 'error');
     }
     setCsvUploading(false);
   };
@@ -251,15 +284,24 @@ function Dashboard() {
     alert(`Send mail for ticket ${request.ticket_number}`);
   };
 
+  // Filter requests based on search
+  const filteredRequests = requests.filter(r =>
+    (r.ticket_number && r.ticket_number.toLowerCase().includes(search.toLowerCase())) ||
+    (r.description && r.description.toLowerCase().includes(search.toLowerCase())) ||
+    (r.chassis_number && r.chassis_number.toLowerCase().includes(search.toLowerCase())) ||
+    (r.request_type && r.request_type.toLowerCase().includes(search.toLowerCase())) ||
+    (r.request_status && r.request_status.toLowerCase().includes(search.toLowerCase()))
+  );
+
   return (
-    <Box sx={{ flexGrow: 1, bgcolor: '#f5f6fa', minHeight: '100vh' }}>
+    <Box sx={{ flexGrow: 1, bgcolor: '#f5f6fa', minHeight: '100vh', width: '100vw' }}>
       <AppBar position="static" color="primary">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>Service Requests Dashboard</Typography>
         </Toolbar>
       </AppBar>
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
+      <Container disableGutters sx={{ width: '100vw', height: '100vh', p: 0, m: 0 }}>
+        <Paper elevation={2} sx={{ p: 3, mb: 4, width: '100vw' }}>
           <Typography variant="h6" gutterBottom>Bulk Import Service Requests (CSV)</Typography>
           <Box display="flex" alignItems="center" gap={2}>
             <Button variant="contained" component="label" color="secondary">
@@ -273,133 +315,162 @@ function Dashboard() {
           </Box>
           {csvUploadMsg && <Typography sx={{ mt: 2 }} color={csvUploadMsg.includes("success") ? "green" : "red"}>{csvUploadMsg}</Typography>}
         </Paper>
-        <Paper elevation={2} sx={{ p: 3 }}>
+        <Paper elevation={2} sx={{ p: 3, width: '100vw' }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography variant="h6" gutterBottom>Service Requests</Typography>
-            <Button variant="outlined" color="primary" component={RouterLink} to="/inventory">
-              Go to Inventory
-            </Button>
+            {/* Removed Go to Inventory button */}
+          </Box>
+          <Box display="flex" justifyContent="flex-end" mb={2}>
+            <TextField
+              label="Search Requests"
+              variant="outlined"
+              size="small"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              sx={{ minWidth: 250 }}
+            />
           </Box>
           {loading ? (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
               <CircularProgress />
             </Box>
           ) : (
-            <TableContainer sx={{ maxHeight: 600 }}>
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Ticket Number</TableCell>
-                    <TableCell>Customer Name</TableCell>
-                    <TableCell>Chassis Number</TableCell>
-                    <TableCell>Request Type</TableCell>
-                    <TableCell>Warranty Status</TableCell>
-                    <TableCell>Request Status</TableCell>
-                    <TableCell>Technician</TableCell>
-                    <TableCell>Send Mail</TableCell>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Description</TableCell>
-                    <TableCell>Media</TableCell>
-                    <TableCell>Edit</TableCell>
-                    <TableCell>Spare Parts Used</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {Array.isArray(requests) && requests.length > 0 ? (
-                    requests.map((r, idx) => (
-                      <React.Fragment key={r.id}>
-                        <TableRow>
-                          <TableCell>{r.ticket_number}</TableCell>
-                          <TableCell>{r.description}</TableCell>
-                          <TableCell>{r.chassis_number}</TableCell>
-                          <TableCell>{r.request_type}</TableCell>
-                          <TableCell>{r.warranty_status}</TableCell>
-                          <TableCell>{r.request_status}</TableCell>
-                          <TableCell>
-                            <TextField
-                              select
-                              size="small"
-                              value={r.technician_id || ''}
-                              onChange={e => handleAssignTechnician(r.id, e.target.value)}
-                              disabled={assigning[r.id]}
-                              style={{ minWidth: 120 }}
-                            >
-                              <MenuItem value="">Unassigned</MenuItem>
-                              {TECHNICIANS.map(t => (
-                                <MenuItem key={t.id} value={t.id}>{t.name}</MenuItem>
-                              ))}
-                            </TextField>
-                          </TableCell>
-                          <TableCell>
-                            <Button variant="contained" color="secondary" size="small" onClick={() => handleSendMail(r)}>
-                              Send Mail
-                            </Button>
-                          </TableCell>
-                          <TableCell>{r.created_at ? r.created_at.split('T')[0] : ''}</TableCell>
-                          <TableCell>{r.description}</TableCell>
-                          <TableCell>
-                            {r.photos && (
-                              <a href={`https://adwita-agros.onrender.com/${r.photos}`} target="_blank" rel="noopener noreferrer">Photo</a>
-                            )}
-                            {r.videos && r.videos.split(',').map((v, i) => (
-                              <span key={i}>
-                                {' '}
-                                <a href={`https://adwita-agros.onrender.com/${v}`} target="_blank" rel="noopener noreferrer">Media {i + 1}</a>
-                              </span>
-                            ))}
-                          </TableCell>
-                          <TableCell>
-                            <Button onClick={() => handleEdit(r)} variant="outlined" size="small">Edit</Button>
-                          </TableCell>
-                          <TableCell>
-                            <IconButton onClick={() => handleExpand(r.id)}>
-                              <ExpandMore />
-                            </IconButton>
-                            <IconButton onClick={() => openPartDialog(r.id)}>
-                              <AddIcon />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                        {expanded === r.id && (
+            <>
+              <TableContainer sx={{ width: '100vw', overflowX: 'auto' }}>
+                <Table stickyHeader sx={{ width: '100vw', tableLayout: 'auto', minWidth: 900 }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Ticket Number</TableCell>
+                      <TableCell>Customer Name</TableCell>
+                      <TableCell>Chassis Number</TableCell>
+                      <TableCell>Request Type</TableCell>
+                      <TableCell>Warranty Status</TableCell>
+                      <TableCell>Request Status</TableCell>
+                      <TableCell>Technician</TableCell>
+                      <TableCell>Send Mail</TableCell>
+                      <TableCell>Date</TableCell>
+                      <TableCell>Description</TableCell>
+                      <TableCell>Media</TableCell>
+                      <TableCell>Edit</TableCell>
+                      <TableCell>Spare Parts Used</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {Array.isArray(paginatedRequests) && paginatedRequests.length > 0 ? (
+                      paginatedRequests.map((r, idx) => (
+                        <React.Fragment key={r.id}>
                           <TableRow>
-                            <TableCell colSpan={13} style={{ background: '#f9f9f9' }}>
-                              <Typography variant="subtitle1">Spare Parts Used</Typography>
-                              <Table size="small">
-                                <TableHead>
-                                  <TableRow>
-                                    <TableCell>Part Code</TableCell>
-                                    <TableCell>Part Name</TableCell>
-                                    <TableCell>Quantity Used</TableCell>
-                                    <TableCell>Current Inventory</TableCell>
-                                    <TableCell>Actions</TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {(parts[r.id] || []).map(part => (
-                                    <TableRow key={part.id}>
-                                      <TableCell>{part.part_code}</TableCell>
-                                      <TableCell>{part.part_name}</TableCell>
-                                      <TableCell>{part.quantity_used}</TableCell>
-                                      <TableCell>{inventory.find(i => i.part_code === part.part_code)?.quantity ?? 'N/A'}</TableCell>
-                                      <TableCell>
-                                        <IconButton onClick={() => openPartDialog(r.id, part)}><EditIcon /></IconButton>
-                                        <IconButton onClick={() => handlePartDelete(r.id, part.id)} color="error"><DeleteIcon /></IconButton>
-                                      </TableCell>
-                                    </TableRow>
+                            <TableCell>{r.ticket_number}</TableCell>
+                            <TableCell>{r.description}</TableCell>
+                            <TableCell>{r.chassis_number}</TableCell>
+                            <TableCell>{r.request_type}</TableCell>
+                            <TableCell>{r.warranty_status}</TableCell>
+                            <TableCell>{r.request_status}</TableCell>
+                            <TableCell>
+                              {role === 'technician' || role === 'admin' ? (
+                                <TextField
+                                  select
+                                  size="small"
+                                  value={r.technician_id || ''}
+                                  onChange={e => handleAssignTechnician(r.id, e.target.value)}
+                                  disabled={assigning[r.id]}
+                                  style={{ minWidth: 120 }}
+                                >
+                                  <MenuItem value="">Unassigned</MenuItem>
+                                  {TECHNICIANS.map(t => (
+                                    <MenuItem key={t.id} value={t.id}>{t.name}</MenuItem>
                                   ))}
-                                </TableBody>
-                              </Table>
+                                </TextField>
+                              ) : (
+                                TECHNICIANS.find(t => t.id === r.technician_id)?.name || 'Unassigned'
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {role === 'admin' && (
+                                <Button variant="contained" color="secondary" size="small" onClick={() => handleSendMail(r)}>
+                                  Send Mail
+                                </Button>
+                              )}
+                            </TableCell>
+                            <TableCell>{r.created_at ? r.created_at.split('T')[0] : ''}</TableCell>
+                            <TableCell>{r.description}</TableCell>
+                            <TableCell>
+                              {Array.isArray(r.photos) && r.photos.length > 0 && r.photos.map((url, i) => (
+                                <img key={i} src={`https://adwita-agros.onrender.com/${url}`} alt={`photo-${i}`} style={{ width: 60, height: 40, objectFit: 'cover', marginRight: 4, borderRadius: 4 }} />
+                              ))}
+                              {Array.isArray(r.videos) && r.videos.length > 0 && r.videos.map((url, i) => (
+                                <video key={i} src={`https://adwita-agros.onrender.com/${url}`} controls style={{ width: 80, height: 40, marginRight: 4, borderRadius: 4 }} />
+                              ))}
+                            </TableCell>
+                            <TableCell>
+                              {role === 'admin' && (
+                                <Button onClick={() => handleEdit(r)} variant="outlined" size="small">Edit</Button>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {(role === 'admin' || role === 'technician') && (
+                                <>
+                                  <IconButton onClick={() => handleExpand(r.id)}>
+                                    <ExpandMore />
+                                  </IconButton>
+                                  <IconButton onClick={() => openPartDialog(r.id)}>
+                                    <AddIcon />
+                                  </IconButton>
+                                </>
+                              )}
                             </TableCell>
                           </TableRow>
-                        )}
-                      </React.Fragment>
-                    ))
-                  ) : (
-                    <TableRow><TableCell colSpan={14} style={{color: 'red'}}>No service requests found.</TableCell></TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                          {expanded === r.id && (
+                            <TableRow>
+                              <TableCell colSpan={13} style={{ background: '#f9f9f9' }}>
+                                <Typography variant="subtitle1">Spare Parts Used</Typography>
+                                <Table size="small">
+                                  <TableHead>
+                                    <TableRow>
+                                      <TableCell>Part Code</TableCell>
+                                      <TableCell>Part Name</TableCell>
+                                      <TableCell>Quantity Used</TableCell>
+                                      <TableCell>Current Inventory</TableCell>
+                                      <TableCell>Actions</TableCell>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {(parts[r.id] || []).map(part => (
+                                      <TableRow key={part.id}>
+                                        <TableCell>{part.part_code}</TableCell>
+                                        <TableCell>{part.part_name}</TableCell>
+                                        <TableCell>{part.quantity_used}</TableCell>
+                                        <TableCell>{inventory.find(i => i.part_code === part.part_code)?.quantity ?? 'N/A'}</TableCell>
+                                        <TableCell>
+                                          {(role === 'admin' || role === 'technician') && (
+                                            <>
+                                              <IconButton onClick={() => openPartDialog(r.id, part)}><EditIcon /></IconButton>
+                                              <IconButton onClick={() => handlePartDelete(r.id, part.id)} color="error"><DeleteIcon /></IconButton>
+                                            </>
+                                          )}
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </React.Fragment>
+                      ))
+                    ) : (
+                      <TableRow><TableCell colSpan={14} style={{color: 'red'}}>No service requests found.</TableCell></TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <Pagination
+                count={Math.ceil(filteredRequests.length / itemsPerPage)}
+                page={page}
+                onChange={(e, value) => setPage(value)}
+                sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}
+              />
+            </>
           )}
         </Paper>
       </Container>
@@ -456,14 +527,21 @@ function Dashboard() {
           </DialogActions>
         </form>
       </Dialog>
-      <Button variant="contained" color="primary" startIcon={<AddIcon />} sx={{ mt: 2 }} onClick={openAddDialog}>
-        Add Service Request
-      </Button>
+      {role === 'admin' && (
+        <Button variant="contained" color="primary" startIcon={<AddIcon />} sx={{ mt: 2 }} onClick={openAddDialog}>
+          Add Service Request
+        </Button>
+      )}
     </Box>
   );
 }
 
-function AppNavBar() {
+function AppNavBar({ onLogout, role, darkMode, setDarkMode }) {
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      onLogout();
+    }
+  };
   return (
     <AppBar position="static" color="primary">
       <Toolbar>
@@ -471,6 +549,12 @@ function AppNavBar() {
           Adwita Agros
         </Typography>
         <Box>
+          <Typography variant="body2" sx={{ mx: 2, display: 'inline', color: 'yellow' }}>
+            Role: {role}
+          </Typography>
+          <Button color="inherit" onClick={() => setDarkMode(dm => !dm)} sx={{ mx: 2 }}>
+            {darkMode ? 'Light Mode' : 'Dark Mode'}
+          </Button>
           <Link component={RouterLink} to="/" color="inherit" underline="none" sx={{ mx: 2 }}>
             Dashboard
           </Link>
@@ -480,6 +564,9 @@ function AppNavBar() {
           <Link component={RouterLink} to="/service-request" color="inherit" underline="none" sx={{ mx: 2 }}>
             Service Request Form
           </Link>
+          <Button color="inherit" onClick={handleLogout} sx={{ ml: 2 }}>
+            Logout
+          </Button>
         </Box>
       </Toolbar>
     </AppBar>
@@ -511,19 +598,72 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+// Notification context
+const NotificationContext = createContext(() => {});
+export function useNotification() {
+  return useContext(NotificationContext);
+}
+
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
+  // Persist login state in localStorage
+  const [loggedIn, setLoggedIn] = useState(() => {
+    return localStorage.getItem('loggedIn') === 'true';
+  });
+  const [role, setRole] = useState(() => localStorage.getItem('role') || '');
   const location = useLocation();
   const isLoginPage = location.pathname === '/' && !loggedIn;
+
+  // Update localStorage when login state changes
+  useEffect(() => {
+    localStorage.setItem('loggedIn', loggedIn);
+    if (!loggedIn) {
+      localStorage.removeItem('role');
+      setRole('');
+    }
+  }, [loggedIn]);
+
+  // Pass setLoggedIn and setRole to Login so it can set login state and role
+  // Notification state
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const showNotification = (message, severity = 'info') => {
+    setSnackbar({ open: true, message, severity });
+  };
+  const handleSnackbarClose = () => setSnackbar({ ...snackbar, open: false });
+
+  // Add dark mode toggle and theme
+  const [darkMode, setDarkMode] = useState(false);
+  const theme = createTheme({
+    palette: {
+      mode: darkMode ? 'dark' : 'light',
+      primary: { main: '#1976d2' },
+      secondary: { main: '#9c27b0' },
+    },
+  });
+
   return (
-    <ErrorBoundary>
-      {!isLoginPage && <AppNavBar />}
-      <Routes>
-        <Route path="/service-request" element={<ServiceRequestForm />} />
-        <Route path="/inventory" element={<InventoryPage />} />
-        <Route path="/*" element={loggedIn ? <Dashboard /> : <Login onLogin={() => setLoggedIn(true)} />} />
-      </Routes>
-    </ErrorBoundary>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <NotificationContext.Provider value={showNotification}>
+        <ErrorBoundary>
+          {!isLoginPage && <AppNavBar onLogout={() => { setLoggedIn(false); localStorage.removeItem('loggedIn'); localStorage.removeItem('role'); setRole(''); }} role={role} darkMode={darkMode} setDarkMode={setDarkMode} />}
+          <Routes>
+            <Route path="/service-request" element={<ServiceRequestForm role={role} />} />
+            <Route path="/inventory" element={<InventoryPage role={role} />} />
+            <Route path="/*" element={loggedIn ? <Dashboard key={loggedIn} role={role} showNotification={showNotification} /> : <Login onLogin={(r) => { setLoggedIn(true); setRole(r); }} />} />
+          </Routes>
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={4000}
+            onClose={handleSnackbarClose}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          >
+            <MuiAlert elevation={6} variant="filled" onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+              {snackbar.message}
+            </MuiAlert>
+          </Snackbar>
+        </ErrorBoundary>
+      </NotificationContext.Provider>
+    </ThemeProvider>
   );
 }
 

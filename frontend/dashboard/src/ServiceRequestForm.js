@@ -40,8 +40,8 @@ const FIELDS = {
 export default function ServiceRequestForm() {
   const [requestType, setRequestType] = useState('');
   const [form, setForm] = useState({});
-  const [photoChassis, setPhotoChassis] = useState(null);
-  const [mediaIssue, setMediaIssue] = useState([]);
+  const [photos, setPhotos] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,8 +49,8 @@ export default function ServiceRequestForm() {
   const handleTypeChange = (e) => {
     setRequestType(e.target.value);
     setForm({});
-    setPhotoChassis(null);
-    setMediaIssue([]);
+    setPhotos([]);
+    setVideos([]);
     setSuccess(null);
     setError('');
   };
@@ -60,11 +60,11 @@ export default function ServiceRequestForm() {
   };
 
   const handlePhotoChassis = (e) => {
-    setPhotoChassis(e.target.files[0]);
+    setPhotos(Array.from(e.target.files));
   };
 
   const handleMediaIssue = (e) => {
-    setMediaIssue(Array.from(e.target.files));
+    setVideos(Array.from(e.target.files));
   };
 
   const handleSubmit = async (e) => {
@@ -77,11 +77,11 @@ export default function ServiceRequestForm() {
     FIELDS[requestType].forEach(f => {
       data.append(f.name, form[f.name] || '');
     });
-    if (photoChassis) {
-      data.append('photo_chassis', photoChassis);
+    if (photos.length > 0) {
+      photos.forEach(file => data.append('photo_chassis', file));
     }
-    if (mediaIssue.length > 0) {
-      mediaIssue.forEach(file => data.append('media_issue', file));
+    if (videos.length > 0) {
+      videos.forEach(file => data.append('media_issue', file));
     }
     try {
       const res = await fetch('https://adwita-agros.onrender.com/public-service-request/', {
@@ -92,8 +92,8 @@ export default function ServiceRequestForm() {
       if (result.success) {
         setSuccess(result.ticket_number);
         setForm({});
-        setPhotoChassis(null);
-        setMediaIssue([]);
+        setPhotos([]);
+        setVideos([]);
       } else {
         setError('Submission failed. Please try again.');
       }
@@ -136,20 +136,22 @@ export default function ServiceRequestForm() {
                   {f.type === 'chassis' && (
                     <Box mt={1}>
                       <Button variant="outlined" component="label">
-                        Upload Chassis Photo
-                        <input type="file" accept="image/*" hidden onChange={handlePhotoChassis} />
+                        Upload Photos
+                        <input type="file" accept="image/*" hidden onChange={handlePhotoChassis} multiple />
                       </Button>
-                      {photoChassis && <Typography variant="body2" sx={{ ml: 2 }}>{photoChassis.name}</Typography>}
+                      {photos.length > 0 && (
+                        <Typography variant="body2" sx={{ ml: 2 }}>{photos.map(f => f.name).join(', ')}</Typography>
+                      )}
                     </Box>
                   )}
                   {f.type === 'desc' && (
                     <Box mt={1}>
                       <Button variant="outlined" component="label">
-                        Add Photo/Video of Issue
-                        <input type="file" accept="image/*,video/*" multiple hidden onChange={handleMediaIssue} />
+                        Add Videos
+                        <input type="file" accept="video/*" hidden onChange={handleMediaIssue} multiple />
                       </Button>
-                      {mediaIssue.length > 0 && (
-                        <Typography variant="body2" sx={{ ml: 2 }}>{mediaIssue.map(f => f.name).join(', ')}</Typography>
+                      {videos.length > 0 && (
+                        <Typography variant="body2" sx={{ ml: 2 }}>{videos.map(f => f.name).join(', ')}</Typography>
                       )}
                     </Box>
                   )}

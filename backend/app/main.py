@@ -208,6 +208,9 @@ def list_service_requests(db: Session = Depends(get_db)):
         spu = sr.spare_parts_used[0] if sr.spare_parts_used else None
         def dt(val):
             return val.isoformat() if val else ""
+        # Split photos and videos into arrays
+        photo_list = [p for p in (sr.photos or '').split(',') if p]
+        video_list = [v for v in (sr.videos or '').split(',') if v]
         results.append({
             "id": sr.id,
             "ticket_number": sr.ticket_number,
@@ -232,7 +235,10 @@ def list_service_requests(db: Session = Depends(get_db)):
             "quantity": spu.quantity_used if spu else "",
             "who_gave_parts": spu.who_gave_parts if spu else "",
             "old_parts_location": spu.old_parts_location if spu else "",
-            "manufacturer_replacement_status": spu.manufacturer_replacement_status if spu else ""
+            "manufacturer_replacement_status": spu.manufacturer_replacement_status if spu else "",
+            # Media fields
+            "photos": photo_list,
+            "videos": video_list
         })
     print("First 5 service requests returned to frontend:")
     for row in results[:5]:
