@@ -1,0 +1,8 @@
+{
+  "/service-request/page": "app/service-request/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/manufacturer/page": "app/manufacturer/page.js",
+  "/login/page": "app/login/page.js",
+  "/operator/page": "app/operator/page.js",
+  "/page": "app/page.js"
+}

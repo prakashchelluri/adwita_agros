@@ -1,0 +1,31 @@
+import { Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
+import { WhatsAppSession } from './entities/whatsapp-session.entity';
+import { ServiceRequestsService } from '../service-requests/service-requests.service';
+import { VehiclesService } from '../vehicles/vehicles.service';
+import { CustomersService } from '../customers/customers.service';
+export declare class WhatsAppService {
+    private sessionRepository;
+    private configService;
+    private serviceRequestsService;
+    private vehiclesService;
+    private customersService;
+    private readonly logger;
+    private twilioClient;
+    constructor(sessionRepository: Repository<WhatsAppSession>, configService: ConfigService, serviceRequestsService: ServiceRequestsService, vehiclesService: VehiclesService, customersService: CustomersService);
+    handleIncomingMessage(from: string, body: string, mediaUrls?: string[]): Promise<void>;
+    private processMessage;
+    private handleInitialMessage;
+    private handleServiceTypeSelection;
+    private handleNameInput;
+    private handleChassisNumberInput;
+    private handleChassisPhotoInput;
+    private handleLocationInput;
+    private handleAlternateContactInput;
+    private handleIssueDescriptionInput;
+    private handleIssueMediaInput;
+    private createServiceRequest;
+    private getServiceTypeDisplay;
+    sendMessage(to: string, message: string): Promise<void>;
+    sendStatusUpdate(phoneNumber: string, ticketNumber: string, status: string, notes?: string): Promise<void>;
+}

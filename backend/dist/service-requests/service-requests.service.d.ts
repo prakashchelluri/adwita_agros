@@ -1,0 +1,31 @@
+import { Repository } from 'typeorm';
+import { ServiceRequest } from './service-request.entity';
+import { CreateServiceRequestDto } from './dto/create-service-request.dto';
+import { UpdateServiceRequestDto } from './dto/update-service-request.dto';
+import { UpdateApprovalStatusDto } from './dto/update-approval-status.dto';
+import { AddPartToRequestDto } from './dto/add-part-to-request.dto';
+import { QueryServiceRequestDto } from './dto/query-service-request.dto';
+import { Vehicle } from '../vehicles/entities/vehicle.entity';
+import { Customer } from '../customers/customer.entity';
+import { User } from '../users/user.entity';
+import { ServiceRequestPartUsed } from './service-request-part-used.entity';
+import { InventoryPart } from '../inventory/inventory-part.entity';
+export declare class ServiceRequestsService {
+    private readonly serviceRequestRepository;
+    private readonly vehicleRepository;
+    private readonly customerRepository;
+    private readonly userRepository;
+    private readonly partUsedRepository;
+    private readonly inventoryRepository;
+    private readonly WARRANTY_PERIOD_DAYS;
+    constructor(serviceRequestRepository: Repository<ServiceRequest>, vehicleRepository: Repository<Vehicle>, customerRepository: Repository<Customer>, userRepository: Repository<User>, partUsedRepository: Repository<ServiceRequestPartUsed>, inventoryRepository: Repository<InventoryPart>);
+    create(createServiceRequestDto: CreateServiceRequestDto): Promise<ServiceRequest>;
+    findAll(query?: QueryServiceRequestDto): Promise<ServiceRequest[]>;
+    findOne(id: number): Promise<ServiceRequest>;
+    update(id: number, updateDto: UpdateServiceRequestDto): Promise<ServiceRequest>;
+    updateApprovalStatus(id: number, approvalDto: UpdateApprovalStatusDto): Promise<ServiceRequest>;
+    addPartToRequest(id: number, addPartDto: AddPartToRequestDto): Promise<ServiceRequestPartUsed>;
+    findByTicketNumber(ticketNumber: string): Promise<ServiceRequest>;
+    findPendingApprovals(): Promise<ServiceRequest[]>;
+    private _generateTicketNumber;
+}
