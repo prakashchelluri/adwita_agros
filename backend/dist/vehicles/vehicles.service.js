@@ -43,6 +43,31 @@ let VehiclesService = class VehiclesService {
         });
         return this.vehicleRepository.save(vehicle);
     }
+    async createWithCustomer(createVehicleWithCustomerDto) {
+        const existingVehicle = await this.vehicleRepository.findOneBy({
+            chassisNumber: createVehicleWithCustomerDto.chassisNumber,
+        });
+        if (existingVehicle) {
+            throw new common_1.ConflictException('Vehicle with this chassis number already exists');
+        }
+        let customer = await this.customerRepository.findOneBy({
+            primaryPhone: createVehicleWithCustomerDto.primaryPhone,
+        });
+        if (!customer) {
+            customer = this.customerRepository.create({
+                fullName: createVehicleWithCustomerDto.fullName,
+                primaryPhone: createVehicleWithCustomerDto.primaryPhone,
+            });
+            await this.customerRepository.save(customer);
+        }
+        const vehicle = this.vehicleRepository.create({
+            chassisNumber: createVehicleWithCustomerDto.chassisNumber,
+            purchaseDate: new Date(createVehicleWithCustomerDto.purchaseDate),
+            invoiceNumber: createVehicleWithCustomerDto.invoiceNumber,
+            customer,
+        });
+        return this.vehicleRepository.save(vehicle);
+    }
     async findAll() {
         return this.vehicleRepository.find({
             relations: ['customer'],

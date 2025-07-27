@@ -9,4 +9,5 @@ export declare class UsersService {
     findOneByUsername(username: string): Promise<User | undefined>;
     findOneByIdAndRole(id: number, role?: UserRole): Promise<User>;
     findAllByRole(role: UserRole): Promise<Omit<User, 'passwordHash'>[]>;
+    update(id: number, updateData: Partial<User>): Promise<Omit<User, 'passwordHash'>>;
 }

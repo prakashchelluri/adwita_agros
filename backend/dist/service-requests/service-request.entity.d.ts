@@ -20,6 +20,7 @@ export declare class ServiceRequest {
     ticketNumber: string;
     customer: any;
     vehicle: any;
+    partsUsed: any[];
     type: RequestType;
     issueDescription: string;
     customerLocation: string;

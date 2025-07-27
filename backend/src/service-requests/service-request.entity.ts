@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 
 export enum RequestStatus {
@@ -42,6 +43,9 @@ export class ServiceRequest {
   @ManyToOne('Vehicle', { eager: true })
   @JoinColumn({ name: 'vehicle_id' })
   vehicle: any;
+
+  @OneToMany('ServiceRequestPartUsed', 'serviceRequest', { eager: true })
+  partsUsed: any[];
 
   @Column({ type: 'enum', enum: RequestType })
   type: RequestType;

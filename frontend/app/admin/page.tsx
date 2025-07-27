@@ -148,26 +148,26 @@ export default function AdminDashboard() {
               <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
                 Quick Actions
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-md text-sm font-medium">
-                  View Service Requests
-                </button>
-                <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-md text-sm font-medium">
-                  Manage Users
-                </button>
-                <button className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-3 rounded-md text-sm font-medium">
-                  Vehicle Management
-                </button>
-                <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-md text-sm font-medium">
-                  Inventory Management
-                </button>
-                <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-md text-sm font-medium">
-                  Reports & Analytics
-                </button>
-                <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 rounded-md text-sm font-medium">
-                  System Settings
-                </button>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="/admin/service-requests" className="block bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-md text-sm font-medium text-center">
+              View Service Requests
+            </a>
+            <a href="/admin/users" className="block bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-md text-sm font-medium text-center">
+              Manage Users
+            </a>
+            <a href="/admin/vehicles" className="block bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-3 rounded-md text-sm font-medium text-center">
+              Vehicle Management
+            </a>
+            <a href="/admin/inventory" className="block bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-md text-sm font-medium text-center">
+              Inventory Management
+            </a>
+            <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-md text-sm font-medium">
+              Reports & Analytics
+            </button>
+            <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 rounded-md text-sm font-medium">
+              System Settings
+            </button>
+          </div>
             </div>
           </div>
 

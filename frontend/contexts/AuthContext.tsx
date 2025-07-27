@@ -7,6 +7,7 @@ import axios from 'axios';
 interface User {
   id: number;
   username: string;
+  fullName: string;
   email: string;
   role: 'ADMIN' | 'OPERATOR' | 'SUPERVISOR' | 'TECHNICIAN' | 'MANUFACTURER' | 'MANUFACTURER_WAREHOUSE';
 }

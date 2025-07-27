@@ -1,4 +1,4 @@
-import { Controller, Post, Body, ValidationPipe, Get, Query, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, ValidationPipe, Get, Query, UseGuards, BadRequestException, Patch, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './create-user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -28,5 +28,11 @@ export class UsersController {
       throw new BadRequestException('Role query parameter is required.');
     }
     return this.usersService.findAllByRole(role);
+  }
+
+  @Patch(':id')
+  @Roles(UserRole.ADMIN)
+  update(@Param('id') id: string, @Body(new ValidationPipe()) updateData: Partial<CreateUserDto>) {
+    return this.usersService.update(+id, updateData);
   }
 }

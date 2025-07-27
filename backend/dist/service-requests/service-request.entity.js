@@ -52,6 +52,10 @@ __decorate([
     __metadata("design:type", Object)
 ], ServiceRequest.prototype, "vehicle", void 0);
 __decorate([
+    (0, typeorm_1.OneToMany)('ServiceRequestPartUsed', 'serviceRequest', { eager: true }),
+    __metadata("design:type", Array)
+], ServiceRequest.prototype, "partsUsed", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: 'enum', enum: RequestType }),
     __metadata("design:type", String)
 ], ServiceRequest.prototype, "type", void 0);

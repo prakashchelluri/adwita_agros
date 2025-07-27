@@ -62,15 +62,15 @@ export default function ServiceRequestPage() {
 
     setIsCheckingVehicle(true);
     try {
-      const response = await fetch(`/api/public/service-requests/check-vehicle/${formData.chassisNumber}`);
+      const response = await fetch(`http://localhost:3001/public/service-requests/check-vehicle/${formData.chassisNumber}`);
       const data = await response.json();
       setVehicleInfo(data);
 
       if (data.found) {
         setFormData(prev => ({
           ...prev,
-          customerName: data.customer.name,
-          customerPhone: data.customer.phone,
+          customerName: data.customer?.name || '',
+          customerPhone: data.customer?.phone || '',
         }));
       }
     } catch (error) {
@@ -91,7 +91,7 @@ export default function ServiceRequestPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/public/service-requests', {
+      const response = await fetch('http://localhost:3001/public/service-requests', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +103,6 @@ export default function ServiceRequestPage() {
       setSubmitResult(result);
 
       if (result.success) {
-        // Reset form
         setFormData({
           customerName: '',
           customerPhone: '',

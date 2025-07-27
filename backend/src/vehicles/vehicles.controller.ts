@@ -12,6 +12,7 @@ import {
 import { VehiclesService } from './vehicles.service';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
+import { CreateVehicleWithCustomerDto } from './dto/create-vehicle-with-customer.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/roles.guard';
 import { Roles } from '../common/roles.decorator';
@@ -26,6 +27,12 @@ export class VehiclesController {
   @Roles(UserRole.ADMIN, UserRole.OPERATOR)
   create(@Body() createVehicleDto: CreateVehicleDto) {
     return this.vehiclesService.create(createVehicleDto);
+  }
+
+  @Post('with-customer')
+  @Roles(UserRole.ADMIN, UserRole.OPERATOR)
+  createWithCustomer(@Body() createVehicleWithCustomerDto: CreateVehicleWithCustomerDto) {
+    return this.vehiclesService.createWithCustomer(createVehicleWithCustomerDto);
   }
 
   @Get()

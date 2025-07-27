@@ -6,6 +6,7 @@ export declare class Vehicle {
     engineNumber: string;
     modelName: string;
     purchaseDate: Date;
+    invoiceNumber: string;
     warrantyPeriodMonths: number;
     isWarrantyActive: boolean;
     customer: Customer;

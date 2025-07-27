@@ -77,4 +77,21 @@ export class UsersService {
     });
     return users;
   }
+
+  /**
+   * Updates a user by ID.
+   */
+  async update(id: number, updateData: Partial<User>): Promise<Omit<User, 'passwordHash'>> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException(`User with ID "${id}" not found`);
+    }
+
+    Object.assign(user, updateData);
+
+    const updatedUser = await this.userRepository.save(user);
+
+    const { passwordHash, ...result } = updatedUser;
+    return result;
+  }
 }

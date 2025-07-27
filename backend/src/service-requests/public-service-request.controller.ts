@@ -102,4 +102,20 @@ export class PublicServiceRequestController {
       };
     }
   }
+
+  @Get()
+  async getAllPublicRequests() {
+    try {
+      const requests = await this.serviceRequestsService.findAllPublic();
+      return {
+        success: true,
+        data: requests,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Failed to fetch public service requests',
+      };
+    }
+  }
 }

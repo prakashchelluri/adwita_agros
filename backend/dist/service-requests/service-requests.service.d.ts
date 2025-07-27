@@ -26,6 +26,7 @@ export declare class ServiceRequestsService {
     updateApprovalStatus(id: number, approvalDto: UpdateApprovalStatusDto): Promise<ServiceRequest>;
     addPartToRequest(id: number, addPartDto: AddPartToRequestDto): Promise<ServiceRequestPartUsed>;
     findByTicketNumber(ticketNumber: string): Promise<ServiceRequest>;
+    findAllPublic(): Promise<ServiceRequest[]>;
     findPendingApprovals(): Promise<ServiceRequest[]>;
     private _generateTicketNumber;
 }

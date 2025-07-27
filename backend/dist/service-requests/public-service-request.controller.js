@@ -89,6 +89,21 @@ let PublicServiceRequestController = class PublicServiceRequestController {
             };
         }
     }
+    async getAllPublicRequests() {
+        try {
+            const requests = await this.serviceRequestsService.findAllPublic();
+            return {
+                success: true,
+                data: requests,
+            };
+        }
+        catch (error) {
+            return {
+                success: false,
+                message: 'Failed to fetch public service requests',
+            };
+        }
+    }
 };
 exports.PublicServiceRequestController = PublicServiceRequestController;
 __decorate([
@@ -114,6 +129,12 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PublicServiceRequestController.prototype, "getRequestStatus", null);
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], PublicServiceRequestController.prototype, "getAllPublicRequests", null);
 exports.PublicServiceRequestController = PublicServiceRequestController = __decorate([
     (0, common_1.Controller)('public/service-requests'),
     __metadata("design:paramtypes", [service_requests_service_1.ServiceRequestsService,

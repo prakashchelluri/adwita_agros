@@ -58,4 +58,13 @@ export declare class PublicServiceRequestController {
         manufacturerApprovalStatus?: undefined;
         isWarrantyEligible?: undefined;
     }>;
+    getAllPublicRequests(): Promise<{
+        success: boolean;
+        data: import("./service-request.entity").ServiceRequest[];
+        message?: undefined;
+    } | {
+        success: boolean;
+        message: string;
+        data?: undefined;
+    }>;
 }

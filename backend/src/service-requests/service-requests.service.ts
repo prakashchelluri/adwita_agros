@@ -267,6 +267,10 @@ export class ServiceRequestsService {
     return serviceRequest;
   }
 
+  async findAllPublic(): Promise<ServiceRequest[]> {
+    return this.serviceRequestRepository.find();
+  }
+
   /**
    * Get service requests requiring manufacturer approval
    */

@@ -3,11 +3,13 @@ import { Vehicle } from './entities/vehicle.entity';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
 import { Customer } from '../customers/customer.entity';
+import { CreateVehicleWithCustomerDto } from './dto/create-vehicle-with-customer.dto';
 export declare class VehiclesService {
     private readonly vehicleRepository;
     private readonly customerRepository;
     constructor(vehicleRepository: Repository<Vehicle>, customerRepository: Repository<Customer>);
     create(createVehicleDto: CreateVehicleDto): Promise<Vehicle>;
+    createWithCustomer(createVehicleWithCustomerDto: CreateVehicleWithCustomerDto): Promise<Vehicle>;
     findAll(): Promise<Vehicle[]>;
     findOne(id: number): Promise<Vehicle>;
     findOneByChassisNumber(chassisNumber: string): Promise<Vehicle>;

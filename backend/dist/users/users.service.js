@@ -57,6 +57,16 @@ let UsersService = class UsersService {
         });
         return users;
     }
+    async update(id, updateData) {
+        const user = await this.userRepository.findOneBy({ id });
+        if (!user) {
+            throw new common_1.NotFoundException(`User with ID "${id}" not found`);
+        }
+        Object.assign(user, updateData);
+        const updatedUser = await this.userRepository.save(user);
+        const { passwordHash, ...result } = updatedUser;
+        return result;
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

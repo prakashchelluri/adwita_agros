@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const vehicles_service_1 = require("./vehicles.service");
 const create_vehicle_dto_1 = require("./dto/create-vehicle.dto");
 const update_vehicle_dto_1 = require("./dto/update-vehicle.dto");
+const create_vehicle_with_customer_dto_1 = require("./dto/create-vehicle-with-customer.dto");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const roles_guard_1 = require("../common/roles.guard");
 const roles_decorator_1 = require("../common/roles.decorator");
@@ -27,6 +28,9 @@ let VehiclesController = class VehiclesController {
     }
     create(createVehicleDto) {
         return this.vehiclesService.create(createVehicleDto);
+    }
+    createWithCustomer(createVehicleWithCustomerDto) {
+        return this.vehiclesService.createWithCustomer(createVehicleWithCustomerDto);
     }
     findAll(customerId) {
         if (customerId) {
@@ -59,6 +63,14 @@ __decorate([
     __metadata("design:paramtypes", [create_vehicle_dto_1.CreateVehicleDto]),
     __metadata("design:returntype", void 0)
 ], VehiclesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Post)('with-customer'),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.OPERATOR),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_vehicle_with_customer_dto_1.CreateVehicleWithCustomerDto]),
+    __metadata("design:returntype", void 0)
+], VehiclesController.prototype, "createWithCustomer", null);
 __decorate([
     (0, common_1.Get)(),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.OPERATOR, user_role_enum_1.UserRole.SUPERVISOR),

@@ -187,6 +187,9 @@ let ServiceRequestsService = class ServiceRequestsService {
         }
         return serviceRequest;
     }
+    async findAllPublic() {
+        return this.serviceRequestRepository.find();
+    }
     async findPendingApprovals() {
         return this.serviceRequestRepository.find({
             where: {

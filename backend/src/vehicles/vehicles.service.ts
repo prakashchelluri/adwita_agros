@@ -6,6 +6,7 @@ import { Vehicle } from './entities/vehicle.entity';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
 import { Customer } from '../customers/customer.entity';
+import { CreateVehicleWithCustomerDto } from './dto/create-vehicle-with-customer.dto';
 
 @Injectable()
 export class VehiclesService {
@@ -36,6 +37,39 @@ export class VehiclesService {
     const vehicle = this.vehicleRepository.create({
       ...createVehicleDto,
       purchaseDate: new Date(createVehicleDto.purchaseDate),
+      customer,
+    });
+
+    return this.vehicleRepository.save(vehicle);
+  }
+
+  async createWithCustomer(createVehicleWithCustomerDto: CreateVehicleWithCustomerDto): Promise<Vehicle> {
+    // Check if chassis number already exists
+    const existingVehicle = await this.vehicleRepository.findOneBy({
+      chassisNumber: createVehicleWithCustomerDto.chassisNumber,
+    });
+    if (existingVehicle) {
+      throw new ConflictException('Vehicle with this chassis number already exists');
+    }
+
+    // Check if customer exists by primaryPhone
+    let customer = await this.customerRepository.findOneBy({
+      primaryPhone: createVehicleWithCustomerDto.primaryPhone,
+    });
+
+    // If customer does not exist, create new
+    if (!customer) {
+      customer = this.customerRepository.create({
+        fullName: createVehicleWithCustomerDto.fullName,
+        primaryPhone: createVehicleWithCustomerDto.primaryPhone,
+      });
+      await this.customerRepository.save(customer);
+    }
+
+    const vehicle = this.vehicleRepository.create({
+      chassisNumber: createVehicleWithCustomerDto.chassisNumber,
+      purchaseDate: new Date(createVehicleWithCustomerDto.purchaseDate),
+      invoiceNumber: createVehicleWithCustomerDto.invoiceNumber,
       customer,
     });
 

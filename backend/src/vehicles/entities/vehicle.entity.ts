@@ -28,6 +28,9 @@ export class Vehicle {
   @Column({ name: 'purchase_date', type: 'date' })
   purchaseDate: Date;
 
+  @Column({ name: 'invoice_number', nullable: true })
+  invoiceNumber: string;
+
   @Column({ name: 'warranty_period_months', default: 12 })
   warrantyPeriodMonths: number;
 

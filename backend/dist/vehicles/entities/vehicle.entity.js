@@ -44,6 +44,10 @@ __decorate([
     __metadata("design:type", Date)
 ], Vehicle.prototype, "purchaseDate", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'invoice_number', nullable: true }),
+    __metadata("design:type", String)
+], Vehicle.prototype, "invoiceNumber", void 0);
+__decorate([
     (0, typeorm_1.Column)({ name: 'warranty_period_months', default: 12 }),
     __metadata("design:type", Number)
 ], Vehicle.prototype, "warrantyPeriodMonths", void 0);

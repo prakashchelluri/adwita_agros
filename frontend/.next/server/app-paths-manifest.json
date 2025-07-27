@@ -1,8 +1,9 @@
 {
-  "/service-request/page": "app/service-request/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/admin/page": "app/admin/page.js",
-  "/manufacturer/page": "app/manufacturer/page.js",
-  "/login/page": "app/login/page.js",
-  "/operator/page": "app/operator/page.js",
+  "/admin/vehicles/page": "app/admin/vehicles/page.js",
+  "/admin/inventory/page": "app/admin/inventory/page.js",
+  "/service-request/page": "app/service-request/page.js",
+  "/admin/service-requests/page": "app/admin/service-requests/page.js",
   "/page": "app/page.js"
 }
