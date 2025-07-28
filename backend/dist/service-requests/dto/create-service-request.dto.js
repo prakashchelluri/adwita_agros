@@ -65,4 +65,9 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Boolean)
 ], CreateServiceRequestDto.prototype, "isWarrantyEligible", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateServiceRequestDto.prototype, "ticketNumber", void 0);
 //# sourceMappingURL=create-service-request.dto.js.map

@@ -54,4 +54,8 @@ export class CreateServiceRequestDto {
   @IsBoolean()
   @IsOptional()
   isWarrantyEligible?: boolean;
+
+  @IsString()
+  @IsOptional()
+  ticketNumber?: string;
 }

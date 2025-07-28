@@ -6,6 +6,8 @@ export declare class UsersService {
     private readonly userRepository;
     constructor(userRepository: Repository<User>);
     create(createUserDto: CreateUserDto): Promise<Omit<User, 'passwordHash'>>;
+    findAll(): Promise<Omit<User, 'passwordHash'>[]>;
+    findOneById(id: number): Promise<User>;
     findOneByUsername(username: string): Promise<User | undefined>;
     findOneByIdAndRole(id: number, role?: UserRole): Promise<User>;
     findAllByRole(role: UserRole): Promise<Omit<User, 'passwordHash'>[]>;

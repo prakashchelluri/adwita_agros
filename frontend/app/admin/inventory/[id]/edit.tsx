@@ -61,6 +61,20 @@ export default function EditInventoryPage() {
   return (
     <div className="max-w-md mx-auto p-4 bg-white rounded shadow mt-8">
       <h1 className="text-xl font-bold mb-4">Edit Inventory Part</h1>
+      <div className="flex space-x-4 mb-4">
+        <button
+          onClick={() => router.push('/')}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        >
+          Home
+        </button>
+        <button
+          onClick={() => router.back()}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        >
+          Back
+        </button>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="partNumber" className="block font-medium">Part Number</label>

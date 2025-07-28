@@ -10,4 +10,5 @@ export declare class CreateServiceRequestDto {
     customerLocation?: string;
     mediaUrls?: string[];
     isWarrantyEligible?: boolean;
+    ticketNumber?: string;
 }

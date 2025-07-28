@@ -40,6 +40,19 @@ let UsersService = class UsersService {
         const { passwordHash, ...result } = savedUser;
         return result;
     }
+    async findAll() {
+        const users = await this.userRepository.find({
+            select: ['id', 'username', 'email', 'role', 'fullName', 'createdAt', 'updatedAt'],
+        });
+        return users;
+    }
+    async findOneById(id) {
+        const user = await this.userRepository.findOneBy({ id });
+        if (!user) {
+            throw new common_1.NotFoundException(`User with ID "${id}" not found`);
+        }
+        return user;
+    }
     async findOneByUsername(username) {
         return this.userRepository.createQueryBuilder('user').addSelect('user.passwordHash').where('user.username = :username', { username }).getOne();
     }
@@ -61,6 +74,12 @@ let UsersService = class UsersService {
         const user = await this.userRepository.findOneBy({ id });
         if (!user) {
             throw new common_1.NotFoundException(`User with ID "${id}" not found`);
+        }
+        if (updateData.password) {
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(updateData.password, saltRounds);
+            updateData.passwordHash = hashedPassword;
+            delete updateData.password;
         }
         Object.assign(user, updateData);
         const updatedUser = await this.userRepository.save(user);

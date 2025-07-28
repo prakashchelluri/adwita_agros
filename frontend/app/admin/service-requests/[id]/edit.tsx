@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import axios from 'axios';
 import { useAuth } from '@/hooks/useAuth';
-import { ServiceRequest, RequestStatus, RequestType } from '@/lib/types';
+import { ServiceRequest, RequestStatus, RequestType, User, UserRole } from '@/lib/types';
+import Link from 'next/link';
 
 export default function EditServiceRequestPage() {
   const { id } = useParams();
@@ -12,31 +13,50 @@ export default function EditServiceRequestPage() {
   const { token } = useAuth();
 
   const [request, setRequest] = useState<Partial<ServiceRequest>>({});
+  const [technicians, setTechnicians] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [sendingApproval, setSendingApproval] = useState(false);
 
   useEffect(() => {
-    async function fetchRequest() {
+    async function fetchData() {
       try {
         setLoading(true);
-        const response = await axios.get(`/service-requests/${id}`, {
+        
+        // Fetch service request
+        const requestResponse = await axios.get(`/service-requests/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setRequest(response.data);
+        setRequest(requestResponse.data);
+        
+        // Fetch technicians
+        const techResponse = await axios.get('/users', {
+          params: { role: UserRole.TECHNICIAN },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setTechnicians(techResponse.data);
+        
       } catch (err) {
-        setError('Failed to load service request data');
+        setError('Failed to load data');
       } finally {
         setLoading(false);
       }
     }
+    
     if (token) {
-      fetchRequest();
+      fetchData();
     }
   }, [id, token]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setRequest({ ...request, [e.target.name]: e.target.value });
+  };
+
+  const handleTechnicianChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const techId = parseInt(e.target.value);
+    const technician = technicians.find(t => t.id === techId);
+    setRequest({ ...request, assignedTechnician: technician || null });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,12 +75,49 @@ export default function EditServiceRequestPage() {
     }
   };
 
+  const sendForApproval = async () => {
+    setSendingApproval(true);
+    setError(null);
+    try {
+      await axios.post(`/service-requests/${id}/send-for-approval`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert('Request sent to manufacturer for approval');
+      // Refresh request data
+      const response = await axios.get(`/service-requests/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRequest(response.data);
+    } catch (err) {
+      setError('Failed to send for approval');
+    } finally {
+      setSendingApproval(false);
+    }
+  };
+
   if (loading) return <div>Loading service request data...</div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
   return (
     <div className="max-w-lg mx-auto p-4 bg-white rounded shadow mt-8">
       <h1 className="text-xl font-bold mb-4">Edit Service Request</h1>
+      
+      <div className="flex space-x-4 mb-4">
+        <Link href={`/admin/service-requests/${id}/parts`}>
+          <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+            Manage Parts Used
+          </button>
+        </Link>
+        
+        <button
+          onClick={sendForApproval}
+          disabled={sendingApproval}
+          className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 disabled:opacity-50"
+        >
+          {sendingApproval ? 'Sending...' : 'Send for Manufacturer Approval'}
+        </button>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="ticketNumber" className="block font-medium">Ticket Number</label>
@@ -74,6 +131,23 @@ export default function EditServiceRequestPage() {
             disabled
           />
         </div>
+        
+        <div>
+          <label htmlFor="assignedTechnician" className="block font-medium">Assigned Technician</label>
+          <select
+            name="assignedTechnician"
+            id="assignedTechnician"
+            value={request.assignedTechnician?.id || ''}
+            onChange={handleTechnicianChange}
+            className="w-full border border-gray-300 rounded px-3 py-2"
+          >
+            <option value="">Select technician</option>
+            {technicians.map(tech => (
+              <option key={tech.id} value={tech.id}>{tech.fullName}</option>
+            ))}
+          </select>
+        </div>
+        
         <div>
           <label htmlFor="type" className="block font-medium">Type</label>
           <select
@@ -90,6 +164,7 @@ export default function EditServiceRequestPage() {
             ))}
           </select>
         </div>
+        
         <div>
           <label htmlFor="status" className="block font-medium">Status</label>
           <select
@@ -106,6 +181,7 @@ export default function EditServiceRequestPage() {
             ))}
           </select>
         </div>
+        
         <div>
           <label htmlFor="issueDescription" className="block font-medium">Issue Description</label>
           <textarea
@@ -118,6 +194,7 @@ export default function EditServiceRequestPage() {
             required
           />
         </div>
+        
         <button
           type="submit"
           disabled={saving}

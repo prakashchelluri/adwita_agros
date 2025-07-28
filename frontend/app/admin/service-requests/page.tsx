@@ -38,7 +38,40 @@ export default function AdminServiceRequestsPage() {
 
   return (
     <div className="min-h-screen p-8 bg-gray-50">
+      <div className="flex justify-between items-center mb-4">
+        <button
+          onClick={() => window.history.back()}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        >
+          Back
+        </button>
+        <a
+          href="/"
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Home
+        </a>
+      </div>
       <h1 className="text-2xl font-bold mb-4">All Service Requests</h1>
+
+      <div className="mb-4 w-1/3">
+        <label htmlFor="search" className="block font-semibold mb-1">Search by Ticket Number</label>
+        <input
+          id="search"
+          type="text"
+          placeholder="Enter ticket number"
+          className="w-full p-2 border border-gray-300 rounded"
+          onChange={(e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            setRequests((prevRequests) =>
+              prevRequests.filter((request) =>
+                request.ticketNumber.toLowerCase().includes(searchTerm)
+              )
+            );
+          }}
+        />
+      </div>
+
       <table className="min-w-full bg-white border border-gray-300">
         <thead>
           <tr>
@@ -57,8 +90,8 @@ export default function AdminServiceRequestsPage() {
               <td className="py-2 px-4 border-b">{request.ticketNumber}</td>
               <td className="py-2 px-4 border-b">{request.type}</td>
               <td className="py-2 px-4 border-b">{request.status}</td>
-              <td className="py-2 px-4 border-b">{request.customer.fullName}</td>
-              <td className="py-2 px-4 border-b">{request.vehicle.chassisNumber}</td>
+              <td className="py-2 px-4 border-b">{request.customer?.fullName || 'N/A'}</td>
+              <td className="py-2 px-4 border-b">{request.vehicle?.chassisNumber || 'N/A'}</td>
               <td className="py-2 px-4 border-b">{request.assignedTechnician?.fullName || 'Unassigned'}</td>
               <td className="py-2 px-4 border-b">
                 <a href={`/admin/service-requests/${request.id}/edit`} className="text-blue-600 hover:underline">Edit</a>

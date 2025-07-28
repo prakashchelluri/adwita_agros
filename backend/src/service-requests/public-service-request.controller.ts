@@ -39,6 +39,14 @@ export class PublicServiceRequestController {
     // Add media URLs to the DTO
     createDto.mediaUrls = [...(createDto.mediaUrls || []), ...mediaUrls];
 
+    // Link vehicle by chassisNumber if provided
+    if (createDto.chassisNumber) {
+      const vehicle = await this.vehiclesService.findOneByChassisNumber(createDto.chassisNumber);
+      if (vehicle) {
+        createDto.vehicleId = vehicle.id;
+      }
+    }
+
     const serviceRequest = await this.serviceRequestsService.create(createDto);
 
     return {

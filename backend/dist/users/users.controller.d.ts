@@ -5,6 +5,7 @@ export declare class UsersController {
     private readonly usersService;
     constructor(usersService: UsersService);
     create(createUserDto: CreateUserDto): Promise<Omit<import("./user.entity").User, "passwordHash">>;
-    findAllByRole(role: UserRole): Promise<Omit<import("./user.entity").User, "passwordHash">[]>;
+    findAllByRole(role?: UserRole): Promise<Omit<import("./user.entity").User, "passwordHash">[]>;
     update(id: string, updateData: Partial<CreateUserDto>): Promise<Omit<import("./user.entity").User, "passwordHash">>;
+    findOne(id: string): Promise<import("./user.entity").User>;
 }

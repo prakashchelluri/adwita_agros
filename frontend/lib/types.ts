@@ -13,6 +13,7 @@ export interface User {
   fullName: string;
   email: string;
   role: UserRole;
+  password?: string; // Add optional password property
 }
 
 export interface AuthContextType {

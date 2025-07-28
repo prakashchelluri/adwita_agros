@@ -31,6 +31,12 @@ let PublicServiceRequestController = class PublicServiceRequestController {
             mediaUrls.push(...files.map(file => `/uploads/${file.filename}`));
         }
         createDto.mediaUrls = [...(createDto.mediaUrls || []), ...mediaUrls];
+        if (createDto.chassisNumber) {
+            const vehicle = await this.vehiclesService.findOneByChassisNumber(createDto.chassisNumber);
+            if (vehicle) {
+                createDto.vehicleId = vehicle.id;
+            }
+        }
         const serviceRequest = await this.serviceRequestsService.create(createDto);
         return {
             success: true,

@@ -29,6 +29,9 @@ export class User {
   @Column({ name: 'password_hash', type: 'varchar', length: 255, select: false })
   passwordHash: string;
 
+  @Column({ name: 'password', type: 'varchar', length: 255, nullable: true, select: false })
+  password?: string;
+
   @Column({ name: 'full_name', type: 'varchar', length: 255, nullable: true })
   fullName: string;
 

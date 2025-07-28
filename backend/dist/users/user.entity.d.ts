@@ -11,6 +11,7 @@ export declare class User {
     username: string;
     email: string;
     passwordHash: string;
+    password?: string;
     fullName: string;
     role: UserRole;
     createdAt: Date;

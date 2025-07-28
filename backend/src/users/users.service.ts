@@ -44,6 +44,21 @@ export class UsersService {
     return result;
   }
 
+  async findAll(): Promise<Omit<User, 'passwordHash'>[]> {
+    const users = await this.userRepository.find({
+      select: ['id', 'username', 'email', 'role', 'fullName', 'createdAt', 'updatedAt'],
+    });
+    return users;
+  }
+
+  async findOneById(id: number): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException(`User with ID "${id}" not found`);
+    }
+    return user;
+  }
+
   /**
    * Finds a single user by their username.
    * This is used by the authentication service.
@@ -85,6 +100,13 @@ export class UsersService {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User with ID "${id}" not found`);
+    }
+
+    if (updateData.password) {
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(updateData.password, saltRounds);
+      updateData.passwordHash = hashedPassword;
+      delete updateData.password;
     }
 
     Object.assign(user, updateData);

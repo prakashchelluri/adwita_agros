@@ -106,7 +106,7 @@ export default function AdminVehiclesPage() {
       </div>
       <h1 className="text-2xl font-bold mb-4">Vehicle Management</h1>
 
-      <div className="mb-4">
+      <div className="mb-4 w-1/3">
         <label htmlFor="search" className="block font-semibold mb-1">Search by Vehicle Number</label>
         <input
           id="search"
@@ -118,96 +118,99 @@ export default function AdminVehiclesPage() {
         />
       </div>
 
-      <form onSubmit={handleAddVehicleWithCustomer} className="mb-6">
-        <div className="mb-2">
-          <label htmlFor="chassisNumber" className="block font-semibold mb-1">Vehicle Number</label>
-          <input
-            id="chassisNumber"
-            type="text"
-            value={chassisNumber}
-            onChange={(e) => setChassisNumber(e.target.value)}
-            required
-            className="w-full p-2 border border-gray-300 rounded"
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6">
+        <form onSubmit={handleAddVehicleWithCustomer} className="bg-white p-4 rounded shadow flex flex-wrap items-center gap-4">
+          <h2 className="w-full text-lg font-semibold mb-4">Add Vehicle with Customer</h2>
+          <div className="flex-1 min-w-[150px]">
+            <label htmlFor="chassisNumber" className="block font-semibold mb-1">Vehicle Number</label>
+            <input
+              id="chassisNumber"
+              type="text"
+              value={chassisNumber}
+              onChange={(e) => setChassisNumber(e.target.value)}
+              required
+              className="w-full p-2 border border-gray-300 rounded"
+              disabled={submitting}
+            />
+          </div>
+          <div className="flex-1 min-w-[150px]">
+            <label htmlFor="fullName" className="block font-semibold mb-1">Customer Name</label>
+            <input
+              id="fullName"
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+              className="w-full p-2 border border-gray-300 rounded"
+              disabled={submitting}
+            />
+          </div>
+          <div className="flex-1 min-w-[150px]">
+            <label htmlFor="purchaseDate" className="block font-semibold mb-1">Purchase Date</label>
+            <input
+              id="purchaseDate"
+              type="date"
+              value={purchaseDate}
+              onChange={(e) => setPurchaseDate(e.target.value)}
+              required
+              className="w-full p-2 border border-gray-300 rounded"
+              disabled={submitting}
+            />
+          </div>
+          <div className="flex-1 min-w-[150px]">
+            <label htmlFor="invoiceNumber" className="block font-semibold mb-1">Invoice Number</label>
+            <input
+              id="invoiceNumber"
+              type="text"
+              value={invoiceNumber}
+              onChange={(e) => setInvoiceNumber(e.target.value)}
+              required
+              className="w-full p-2 border border-gray-300 rounded"
+              disabled={submitting}
+            />
+          </div>
+          <div className="flex-1 min-w-[150px]">
+            <label htmlFor="primaryPhone" className="block font-semibold mb-1">Primary Phone</label>
+            <input
+              id="primaryPhone"
+              type="tel"
+              value={primaryPhone}
+              onChange={(e) => setPrimaryPhone(e.target.value)}
+              required
+              className="w-full p-2 border border-gray-300 rounded"
+              disabled={submitting}
+            />
+          </div>
+          <button
+            type="submit"
             disabled={submitting}
-          />
-        </div>
-        <div className="mb-2">
-          <label htmlFor="fullName" className="block font-semibold mb-1">Customer Name</label>
-          <input
-            id="fullName"
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-            className="w-full p-2 border border-gray-300 rounded"
-            disabled={submitting}
-          />
-        </div>
-        <div className="mb-2">
-          <label htmlFor="purchaseDate" className="block font-semibold mb-1">Purchase Date</label>
-          <input
-            id="purchaseDate"
-            type="date"
-            value={purchaseDate}
-            onChange={(e) => setPurchaseDate(e.target.value)}
-            required
-            className="w-full p-2 border border-gray-300 rounded"
-            disabled={submitting}
-          />
-        </div>
-        <div className="mb-2">
-          <label htmlFor="invoiceNumber" className="block font-semibold mb-1">Invoice Number</label>
-          <input
-            id="invoiceNumber"
-            type="text"
-            value={invoiceNumber}
-            onChange={(e) => setInvoiceNumber(e.target.value)}
-            required
-            className="w-full p-2 border border-gray-300 rounded"
-            disabled={submitting}
-          />
-        </div>
-        <div className="mb-2">
-          <label htmlFor="primaryPhone" className="block font-semibold mb-1">Primary Phone</label>
-          <input
-            id="primaryPhone"
-            type="tel"
-            value={primaryPhone}
-            onChange={(e) => setPrimaryPhone(e.target.value)}
-            required
-            className="w-full p-2 border border-gray-300 rounded"
-            disabled={submitting}
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={submitting}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-        >
-          {submitting ? 'Adding...' : 'Add Vehicle with Customer'}
-        </button>
-      </form>
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          >
+            {submitting ? 'Adding...' : 'Add Vehicle with Customer'}
+          </button>
+        </form>
 
-      <table className="min-w-full bg-white border border-gray-300">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border-b">Vehicle Number</th>
-            <th className="py-2 px-4 border-b">Customer Name</th>
-            <th className="py-2 px-4 border-b">Purchase Date</th>
-            <th className="py-2 px-4 border-b">Invoice Number</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredVehicles.map(vehicle => (
-            <tr key={vehicle.id} className="text-center">
-              <td className="py-2 px-4 border-b">{vehicle.chassisNumber}</td>
-              <td className="py-2 px-4 border-b">{vehicle.customer?.fullName}</td>
-              <td className="py-2 px-4 border-b">{vehicle.purchaseDate}</td>
-              <td className="py-2 px-4 border-b">{vehicle.invoiceNumber}</td>
+        <table className="min-w-full bg-white border border-gray-300">
+          <thead>
+            <tr>
+              <th className="py-2 px-4 border-b">Vehicle Number</th>
+              <th className="py-2 px-4 border-b">Customer Name</th>
+              <th className="py-2 px-4 border-b">Purchase Date</th>
+              <th className="py-2 px-4 border-b">Invoice Number</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredVehicles.map(vehicle => (
+              <tr key={vehicle.id} className="text-center">
+                <td className="py-2 px-4 border-b">{vehicle.chassisNumber}</td>
+                <td className="py-2 px-4 border-b">{vehicle.customer?.fullName}</td>
+                <td className="py-2 px-4 border-b">{vehicle.purchaseDate}</td>
+                <td className="py-2 px-4 border-b">{vehicle.invoiceNumber}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

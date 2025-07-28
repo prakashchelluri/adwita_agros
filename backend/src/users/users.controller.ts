@@ -23,9 +23,10 @@ export class UsersController {
 
   @Get()
   @Roles(UserRole.ADMIN, UserRole.OPERATOR, UserRole.SUPERVISOR)
-  findAllByRole(@Query('role') role: UserRole) {
+  async findAllByRole(@Query('role') role?: UserRole) {
     if (!role) {
-      throw new BadRequestException('Role query parameter is required.');
+      // If no role provided, return all users
+      return this.usersService.findAll();
     }
     return this.usersService.findAllByRole(role);
   }
@@ -34,5 +35,11 @@ export class UsersController {
   @Roles(UserRole.ADMIN)
   update(@Param('id') id: string, @Body(new ValidationPipe()) updateData: Partial<CreateUserDto>) {
     return this.usersService.update(+id, updateData);
+  }
+
+  @Get(':id')
+  @Roles(UserRole.ADMIN, UserRole.OPERATOR, UserRole.SUPERVISOR)
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOneById(+id);
   }
 }

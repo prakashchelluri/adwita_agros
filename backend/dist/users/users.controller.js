@@ -27,14 +27,17 @@ let UsersController = class UsersController {
     create(createUserDto) {
         return this.usersService.create(createUserDto);
     }
-    findAllByRole(role) {
+    async findAllByRole(role) {
         if (!role) {
-            throw new common_1.BadRequestException('Role query parameter is required.');
+            return this.usersService.findAll();
         }
         return this.usersService.findAllByRole(role);
     }
     update(id, updateData) {
         return this.usersService.update(+id, updateData);
+    }
+    findOne(id) {
+        return this.usersService.findOneById(+id);
     }
 };
 exports.UsersController = UsersController;
@@ -52,7 +55,7 @@ __decorate([
     __param(0, (0, common_1.Query)('role')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], UsersController.prototype, "findAllByRole", null);
 __decorate([
     (0, common_1.Patch)(':id'),
@@ -63,6 +66,14 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "update", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.OPERATOR, user_role_enum_1.UserRole.SUPERVISOR),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "findOne", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
