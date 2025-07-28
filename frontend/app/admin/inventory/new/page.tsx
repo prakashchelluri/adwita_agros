@@ -44,7 +44,7 @@ export default function NewInventoryPartPage() {
         </button>
         <button
           onClick={() => router.back()}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
         >
           Back
         </button>

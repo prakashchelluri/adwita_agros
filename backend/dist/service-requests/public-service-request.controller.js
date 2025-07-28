@@ -35,6 +35,12 @@ let PublicServiceRequestController = class PublicServiceRequestController {
             const vehicle = await this.vehiclesService.findOneByChassisNumber(createDto.chassisNumber);
             if (vehicle) {
                 createDto.vehicleId = vehicle.id;
+                if (vehicle.customer) {
+                    createDto.customerName = vehicle.customer.fullName;
+                    createDto.customerPhone = vehicle.customer.primaryPhone;
+                }
+                const warrantyStatus = await this.vehiclesService.checkWarrantyStatus(vehicle.id);
+                createDto.isWarrantyEligible = warrantyStatus.isUnderWarranty;
             }
         }
         const serviceRequest = await this.serviceRequestsService.create(createDto);

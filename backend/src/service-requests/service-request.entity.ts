@@ -8,6 +8,10 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
+import { Customer } from '../customers/customer.entity';
+import { Vehicle } from '../vehicles/entities/vehicle.entity';
+import { ServiceRequestPartUsed } from './service-request-part-used.entity';
+import { User } from '../users/user.entity';
 
 export enum RequestStatus {
   NEW = 'new',
@@ -38,14 +42,14 @@ export class ServiceRequest {
 
   @ManyToOne('Customer', { eager: true })
   @JoinColumn({ name: 'customer_id' })
-  customer: any;
+  customer: Customer;
 
   @ManyToOne('Vehicle', { eager: true })
   @JoinColumn({ name: 'vehicle_id' })
-  vehicle: any;
+  vehicle: Vehicle;
 
-  @OneToMany('ServiceRequestPartUsed', 'serviceRequest', { eager: true })
-  partsUsed: any[];
+  @OneToMany(() => ServiceRequestPartUsed, (partUsed) => partUsed.serviceRequest, { eager: true, cascade: true })
+  partsUsed: ServiceRequestPartUsed[];
 
   @Column({ type: 'enum', enum: RequestType })
   type: RequestType;
@@ -73,7 +77,7 @@ export class ServiceRequest {
 
   @ManyToOne('User', { nullable: true, eager: true })
   @JoinColumn({ name: 'assigned_technician_id' })
-  assignedTechnician: any;
+  assignedTechnician: User;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

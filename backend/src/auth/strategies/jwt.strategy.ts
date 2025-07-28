@@ -9,7 +9,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET'),
+      secretOrKey: configService.get<string>('JWT_SECRET') || 'fallback_secret',
     });
   }
 
@@ -17,8 +17,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   // The return value is attached to the request object as `req.user`.
   validate(payload: any) {
     if (!payload) {
-      throw new UnauthorizedException();
+      console.error('JWT validation failed: Missing payload');
+      throw new UnauthorizedException('Invalid token');
     }
+    console.log(`Authenticated user: ${payload.username}, role: ${payload.role}`);
     return { userId: payload.sub, username: payload.username, role: payload.role };
   }
 }

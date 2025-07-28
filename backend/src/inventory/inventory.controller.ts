@@ -41,7 +41,7 @@ export class InventoryController {
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN, UserRole.OPERATOR)
+  @Roles(UserRole.ADMIN, UserRole.OPERATOR, UserRole.SUPERVISOR)
   update(@Param('id', ParseIntPipe) id: number, @Body(new ValidationPipe()) updateDto: UpdateInventoryPartDto) {
     return this.inventoryService.update(id, updateDto);
   }

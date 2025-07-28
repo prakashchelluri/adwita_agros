@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/admin/users/page": [
+    "/admin/service-requests/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/users/page.js"
+      "static/chunks/app/admin/service-requests/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -11,10 +11,10 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/admin/users/[id]/edit/page": [
+    "/admin/inventory/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/users/[id]/edit/page.js"
+      "static/chunks/app/admin/inventory/page.js"
     ],
     "/page": [
       "static/chunks/webpack.js",
@@ -26,50 +26,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin/page.js"
     ],
-    "/admin/inventory/page": [
+    "/admin/users/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/inventory/page.js"
+      "static/chunks/app/admin/users/page.js"
     ],
-    "/admin/service-requests/page": [
+    "/admin/vehicles/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/service-requests/page.js"
-    ],
-    "/admin/service-requests/[id]/edit/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/service-requests/[id]/edit/page.js"
-    ],
-    "/admin/service-requests/[id]/parts/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/service-requests/[id]/parts/page.js"
-    ],
-    "/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/login/page.js"
-    ],
-    "/manufacturer/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/manufacturer/page.js"
-    ],
-    "/admin/inventory/new/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/inventory/new/page.js"
-    ],
-    "/service-request/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/service-request/page.js"
-    ],
-    "/technician/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/technician/page.js"
+      "static/chunks/app/admin/vehicles/page.js"
     ]
   }
 }

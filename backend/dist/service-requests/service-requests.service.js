@@ -46,7 +46,9 @@ let ServiceRequestsService = class ServiceRequestsService {
         return this.serviceRequestRepository.findOne({ where: { ticketNumber } });
     }
     async findAllPublic() {
-        return this.serviceRequestRepository.find();
+        return this.serviceRequestRepository.find({
+            relations: ['customer', 'vehicle']
+        });
     }
     async findOne(id) {
         const request = await this.serviceRequestRepository.findOne({

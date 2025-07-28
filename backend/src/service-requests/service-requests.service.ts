@@ -6,6 +6,7 @@ import { CreateServiceRequestDto } from './dto/create-service-request.dto';
 import { UpdateServiceRequestDto } from './dto/update-service-request.dto';
 import { QueryServiceRequestDto } from './dto/query-service-request.dto';
 import { RequestStatus } from '../common/enums/request-status.enum';
+import { RequestType } from '../common/enums/request-type.enum';
 
 @Injectable()
 export class ServiceRequestsService {
@@ -47,8 +48,10 @@ export class ServiceRequestsService {
     return this.serviceRequestRepository.findOne({ where: { ticketNumber } });
   }
 
-  async findAllPublic() {
-    return this.serviceRequestRepository.find();
+  async findAllPublic(): Promise<ServiceRequest[]> {
+    return this.serviceRequestRepository.find({
+      relations: ['customer', 'vehicle']
+    });
   }
 
   async findOne(id: number) {

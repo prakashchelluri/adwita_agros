@@ -19,14 +19,16 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: configService.get('JWT_SECRET'),
+            secretOrKey: configService.get('JWT_SECRET') || 'fallback_secret',
         });
         this.configService = configService;
     }
     validate(payload) {
         if (!payload) {
-            throw new common_1.UnauthorizedException();
+            console.error('JWT validation failed: Missing payload');
+            throw new common_1.UnauthorizedException('Invalid token');
         }
+        console.log(`Authenticated user: ${payload.username}, role: ${payload.role}`);
         return { userId: payload.sub, username: payload.username, role: payload.role };
     }
 };

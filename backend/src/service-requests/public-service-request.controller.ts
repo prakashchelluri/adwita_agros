@@ -39,11 +39,20 @@ export class PublicServiceRequestController {
     // Add media URLs to the DTO
     createDto.mediaUrls = [...(createDto.mediaUrls || []), ...mediaUrls];
 
-    // Link vehicle by chassisNumber if provided
+    // Link vehicle by chassisNumber if provided and get customer details from DB
     if (createDto.chassisNumber) {
       const vehicle = await this.vehiclesService.findOneByChassisNumber(createDto.chassisNumber);
       if (vehicle) {
         createDto.vehicleId = vehicle.id;
+        // Use customer details from database if available
+        if (vehicle.customer) {
+          createDto.customerName = vehicle.customer.fullName;
+          createDto.customerPhone = vehicle.customer.primaryPhone;
+        }
+        
+        // Check warranty status
+        const warrantyStatus = await this.vehiclesService.checkWarrantyStatus(vehicle.id);
+        createDto.isWarrantyEligible = warrantyStatus.isUnderWarranty;
       }
     }
 

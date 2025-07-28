@@ -12,9 +12,9 @@ api.interceptors.request.use(
   (config) => {
     // We only run this on the client-side
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('auth_token');
       if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
+        config.headers['Authorization'] = `Bearer ${token.trim()}`;
       }
     }
     return config;
