@@ -13,5 +13,8 @@ export declare class Vehicle {
     serviceRequests: ServiceRequest[];
     createdAt: Date;
     updatedAt: Date;
+    make: string;
+    model: string;
+    year: number;
     isUnderWarranty(): boolean;
 }

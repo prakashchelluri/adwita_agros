@@ -6,7 +6,7 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/roles.guard';
 import { Roles } from '../common/roles.decorator';
 import { UserRole } from '../users/user-role.enum';

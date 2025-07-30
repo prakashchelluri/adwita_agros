@@ -145,21 +145,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         password
       });
 
-      const { access_token, user: userData } = response.data;
+      const { access_token, user } = response.data;
 
-      if (!access_token || !userData) {
+      if (!access_token || !user) {
         throw new Error('Invalid response from server');
-      }
-
-      // Validate user data structure
-      if (!userData.id || !userData.username || !userData.role) {
-        throw new Error('Invalid user data received from server');
       }
 
       // Store in localStorage with error handling
       try {
         localStorage.setItem('auth_token', access_token);
-        localStorage.setItem('auth_user', JSON.stringify(userData));
+        localStorage.setItem('auth_user', JSON.stringify(user));
       } catch (storageError) {
         console.error('Error storing auth data:', storageError);
         return { success: false, error: 'Failed to store authentication data' };
@@ -170,10 +165,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       // Update state
       setToken(access_token);
-      setUser(userData);
+      setUser(user);
 
-      console.log('Login successful:', userData.username, userData.role);
-      return { success: true, user: userData };
+      console.log('Login successful:', user.username, user.role);
+      return { success: true, user };
     } catch (error: any) {
       console.error('Login failed:', error);
       

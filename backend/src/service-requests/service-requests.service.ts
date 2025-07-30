@@ -35,8 +35,48 @@ export class ServiceRequestsService {
   }
 
   async findAll(query: QueryServiceRequestDto) {
-    // Implement query logic based on parameters
-    return this.serviceRequestRepository.find();
+    const {
+      status,
+      type,
+      isWarrantyEligible,
+      assignedTechnicianId,
+      customerId,
+      vehicleId,
+      search,
+      page = 1,
+      limit = 20
+    } = query;
+
+    const qb = this.serviceRequestRepository.createQueryBuilder('request');
+    
+    // Add relations
+    qb.leftJoinAndSelect('request.customer', 'customer')
+     .leftJoinAndSelect('request.vehicle', 'vehicle')
+     .leftJoinAndSelect('request.assignedTechnician', 'assignedTechnician');
+
+    // Apply filters
+    if (status) qb.andWhere('request.status = :status', { status });
+    if (type) qb.andWhere('request.type = :type', { type });
+    if (isWarrantyEligible !== undefined)
+      qb.andWhere('request.isWarrantyEligible = :isWarrantyEligible', { isWarrantyEligible });
+    if (assignedTechnicianId)
+      qb.andWhere('request.assignedTechnicianId = :assignedTechnicianId', { assignedTechnicianId });
+    if (customerId) qb.andWhere('request.customerId = :customerId', { customerId });
+    if (vehicleId) qb.andWhere('request.vehicleId = :vehicleId', { vehicleId });
+    
+    // Search filter
+    if (search) {
+      qb.andWhere(
+        '(request.ticketNumber LIKE :search OR request.description LIKE :search OR customer.name LIKE :search OR vehicle.licensePlate LIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
+
+    // Pagination
+    const skip = (page - 1) * limit;
+    qb.skip(skip).take(limit);
+
+    return qb.getMany();
   }
 
   async findPublicRequests(query: QueryServiceRequestDto) {
@@ -79,10 +119,12 @@ export class ServiceRequestsService {
     }
   }
 
-  async updateApprovalStatus(id: number, request: ServiceRequest) {
-    // Update only the approval status
-    return this.serviceRequestRepository.update(id, {
-      manufacturerApprovalStatus: request.manufacturerApprovalStatus
-    });
+  async updateApprovalStatus(id: number, updateData: Partial<ServiceRequest>) {
+    await this.serviceRequestRepository.update(id, updateData);
+    const updatedRequest = await this.serviceRequestRepository.findOne({ where: { id } });
+    if (!updatedRequest) {
+      throw new NotFoundException(`Service request with ID ${id} not found`);
+    }
+    return updatedRequest;
   }
 }

@@ -72,6 +72,18 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at' }),
     __metadata("design:type", Date)
 ], Vehicle.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Vehicle.prototype, "make", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Vehicle.prototype, "model", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "year", void 0);
 exports.Vehicle = Vehicle = __decorate([
     (0, typeorm_1.Entity)('vehicles')
 ], Vehicle);

@@ -43,7 +43,7 @@ export declare class PublicServiceRequestController {
         status: import("./service-request.entity").RequestStatus;
         type: import("./service-request.entity").RequestType;
         createdAt: Date;
-        assignedTechnician: any;
+        assignedTechnician: string;
         manufacturerApprovalStatus: import("./service-request.entity").RequestStatus;
         isWarrantyEligible: boolean;
         message?: undefined;

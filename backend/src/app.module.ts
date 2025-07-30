@@ -27,26 +27,17 @@ import { VehiclesModule } from './vehicles/vehicles.module';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('DB_HOST'),
-        port: +configService.get('DB_PORT'),
+        port: +configService.get<number>('DB_PORT'),
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE'),
-        entities: [
-          User,
-          Customer,
-          Vehicle,
-          ServiceRequest,
-          InventoryPart,
-          ServiceRequestPartUsed,
-          JobSheet,
-          TechnicianTimeLog,
-        ],
-        synchronize: true,
+        database: configService.get('DB_NAME'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: false, // Set this to false for production
       }),
+      inject: [ConfigService],
     }),
     UsersModule,
     AuthModule,
@@ -62,4 +53,3 @@ import { VehiclesModule } from './vehicles/vehicles.module';
   providers: [],
 })
 export class AppModule {}
-

@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Customer = void 0;
 const typeorm_1 = require("typeorm");
+const vehicle_entity_1 = require("../vehicles/entities/vehicle.entity");
 let Customer = class Customer {
 };
 exports.Customer = Customer;
@@ -23,23 +24,23 @@ __decorate([
     __metadata("design:type", String)
 ], Customer.prototype, "fullName", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'primary_phone', unique: true }),
+    (0, typeorm_1.Column)({ unique: true }),
     __metadata("design:type", String)
 ], Customer.prototype, "primaryPhone", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'alternate_phones', type: 'jsonb', nullable: true }),
+    (0, typeorm_1.Column)({ type: 'jsonb', nullable: true }),
     __metadata("design:type", Array)
 ], Customer.prototype, "alternatePhones", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Customer.prototype, "address", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)('Vehicle', (vehicle) => vehicle.customer),
+    (0, typeorm_1.OneToMany)(() => vehicle_entity_1.Vehicle, vehicle => vehicle.customer),
     __metadata("design:type", Array)
 ], Customer.prototype, "vehicles", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
+    (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
 ], Customer.prototype, "createdAt", void 0);
 exports.Customer = Customer = __decorate([

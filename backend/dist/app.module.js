@@ -17,14 +17,6 @@ const inventory_module_1 = require("./inventory/inventory.module");
 const job_sheets_module_1 = require("./job-sheets/job-sheets.module");
 const time_logs_module_1 = require("./time-logs/time-logs.module");
 const dashboard_module_1 = require("./dashboard/dashboard.module");
-const user_entity_1 = require("./users/user.entity");
-const customer_entity_1 = require("./customers/customer.entity");
-const vehicle_entity_1 = require("./vehicles/entities/vehicle.entity");
-const service_request_entity_1 = require("./service-requests/service-request.entity");
-const service_request_part_used_entity_1 = require("./service-requests/service-request-part-used.entity");
-const inventory_part_entity_1 = require("./inventory/inventory-part.entity");
-const job_sheet_entity_1 = require("./job-sheets/job-sheet.entity");
-const technician_time_log_entity_1 = require("./time-logs/technician-time-log.entity");
 const customers_module_1 = require("./customers/customers.module");
 const vehicles_module_1 = require("./vehicles/vehicles.module");
 let AppModule = class AppModule {
@@ -39,26 +31,17 @@ exports.AppModule = AppModule = __decorate([
             }),
             typeorm_1.TypeOrmModule.forRootAsync({
                 imports: [config_1.ConfigModule],
-                inject: [config_1.ConfigService],
                 useFactory: (configService) => ({
                     type: 'postgres',
                     host: configService.get('DB_HOST'),
                     port: +configService.get('DB_PORT'),
                     username: configService.get('DB_USERNAME'),
                     password: configService.get('DB_PASSWORD'),
-                    database: configService.get('DB_DATABASE'),
-                    entities: [
-                        user_entity_1.User,
-                        customer_entity_1.Customer,
-                        vehicle_entity_1.Vehicle,
-                        service_request_entity_1.ServiceRequest,
-                        inventory_part_entity_1.InventoryPart,
-                        service_request_part_used_entity_1.ServiceRequestPartUsed,
-                        job_sheet_entity_1.JobSheet,
-                        technician_time_log_entity_1.TechnicianTimeLog,
-                    ],
-                    synchronize: true,
+                    database: configService.get('DB_NAME'),
+                    entities: [__dirname + '/**/*.entity{.ts,.js}'],
+                    synchronize: false,
                 }),
+                inject: [config_1.ConfigService],
             }),
             users_module_1.UsersModule,
             auth_module_1.AuthModule,

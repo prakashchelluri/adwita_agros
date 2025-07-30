@@ -11,17 +11,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var AuthController_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const login_dto_1 = require("./dto/login.dto");
-let AuthController = class AuthController {
+let AuthController = AuthController_1 = class AuthController {
     constructor(authService) {
         this.authService = authService;
+        this.logger = new common_1.Logger(AuthController_1.name);
     }
-    login(loginDto) {
-        return this.authService.login(loginDto);
+    async login(loginDto) {
+        this.logger.debug(`Login attempt for user: ${loginDto.username}`);
+        try {
+            const result = await this.authService.login(loginDto);
+            this.logger.debug(`Login successful for user: ${loginDto.username}`);
+            return result;
+        }
+        catch (error) {
+            this.logger.error(`Login failed for user: ${loginDto.username}`, error.stack);
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.UNAUTHORIZED,
+                error: 'Invalid credentials',
+            }, common_1.HttpStatus.UNAUTHORIZED);
+        }
     }
 };
 exports.AuthController = AuthController;
@@ -30,9 +44,9 @@ __decorate([
     __param(0, (0, common_1.Body)(new common_1.ValidationPipe())),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [login_dto_1.LoginDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
-exports.AuthController = AuthController = __decorate([
+exports.AuthController = AuthController = AuthController_1 = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);

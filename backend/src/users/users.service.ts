@@ -1,16 +1,19 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
 import { UserRole } from '../common/enums/user-role.enum';
-import { CreateUserDto } from './create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private usersRepository: Repository<User>,
   ) {}
 
   /**
@@ -19,8 +22,10 @@ export class UsersService {
    */
   async create(createUserDto: CreateUserDto): Promise<Omit<User, 'passwordHash'>> {
     // Check if a user with the same username or email already exists
-    const existingUser = await this.userRepository.findOne({
-      where: [{ username: createUserDto.username }, { email: createUserDto.email }],
+    // Convert username to lowercase for case-insensitive comparison
+    const usernameLower = createUserDto.username.toLowerCase();
+    const existingUser = await this.usersRepository.findOne({
+      where: [{ username: usernameLower }, { email: createUserDto.email }],
     });
 
     if (existingUser) {
@@ -29,30 +34,30 @@ export class UsersService {
 
     // Hash the password
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(createUserDto.password, saltRounds);
+    const hashedPassword = await bcrypt.hash(createUserDto.passwordHash, saltRounds);
 
-    const newUser = this.userRepository.create({
+    // Store username in lowercase for consistency
+    const newUser = this.usersRepository.create({
       ...createUserDto,
+      username: usernameLower,
       passwordHash: hashedPassword,
     });
 
-    const savedUser = await this.userRepository.save(newUser);
+    const savedUser = await this.usersRepository.save(newUser);
 
     // Important: Never return the password hash in the response.
     // We destructure the saved user object to exclude the passwordHash.
+    // Destructure to remove passwordHash and return the rest
     const { passwordHash, ...result } = savedUser;
-    return result;
+    return result as Omit<User, 'passwordHash'>;
   }
 
-  async findAll(): Promise<Omit<User, 'passwordHash'>[]> {
-    const users = await this.userRepository.find({
-      select: ['id', 'username', 'email', 'role', 'fullName', 'createdAt', 'updatedAt'],
-    });
-    return users;
+  async findAll(): Promise<User[]> {
+    return this.usersRepository.find();
   }
 
   async findOneById(id: number): Promise<User> {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.usersRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User with ID "${id}" not found`);
     }
@@ -65,7 +70,18 @@ export class UsersService {
    * It includes the password hash which is normally excluded.
    */
   async findOneByUsername(username: string): Promise<User | undefined> {
-    return this.userRepository.createQueryBuilder('user').addSelect('user.passwordHash').where('user.username = :username', { username }).getOne();
+    this.logger.debug(`Finding user by username: ${username}`);
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.username = :username', { username: username.toLowerCase() })
+      .addSelect('user.passwordHash')
+      .getOne();
+    if (!user) {
+      this.logger.warn(`User not found: ${username}`);
+    } else {
+      this.logger.debug(`User found: ${username}`);
+    }
+    return user;
   }
 
   /**
@@ -75,7 +91,7 @@ export class UsersService {
     id: number,
     role: UserRole = UserRole.TECHNICIAN,
   ): Promise<User> {
-    const user = await this.userRepository.findOneBy({ id, role });
+    const user = await this.usersRepository.findOneBy({ id, role });
     if (!user) {
       throw new NotFoundException(`User with ID "${id}" and role "${role}" not found`);
     }
@@ -86,7 +102,7 @@ export class UsersService {
    * Finds all users by their role.
    */
   async findAllByRole(role: UserRole): Promise<Omit<User, 'passwordHash'>[]> {
-    const users = await this.userRepository.find({
+    const users = await this.usersRepository.find({
       where: { role },
       select: ['id', 'username', 'email', 'role', 'createdAt', 'updatedAt']
     });
@@ -96,22 +112,22 @@ export class UsersService {
   /**
    * Updates a user by ID.
    */
-  async update(id: number, updateData: Partial<User>): Promise<Omit<User, 'passwordHash'>> {
-    const user = await this.userRepository.findOneBy({ id });
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<Omit<User, 'passwordHash'>> {
+    const user = await this.usersRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User with ID "${id}" not found`);
     }
 
-    if (updateData.password) {
+    if (updateUserDto.passwordHash) {
       const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(updateData.password, saltRounds);
-      updateData.passwordHash = hashedPassword;
-      delete updateData.password;
+      const hashedPassword = await bcrypt.hash(updateUserDto.passwordHash, saltRounds);
+      user.passwordHash = hashedPassword;
+      delete updateUserDto.passwordHash;
     }
 
-    Object.assign(user, updateData);
+    Object.assign(user, updateUserDto);
 
-    const updatedUser = await this.userRepository.save(user);
+    const updatedUser = await this.usersRepository.save(user);
 
     const { passwordHash, ...result } = updatedUser;
     return result;

@@ -2,9 +2,10 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
   OneToMany,
+  CreateDateColumn
 } from 'typeorm';
+import { Vehicle } from '../vehicles/entities/vehicle.entity';
 
 @Entity('customers')
 export class Customer {
@@ -14,18 +15,18 @@ export class Customer {
   @Column()
   fullName: string;
 
-  @Column({ name: 'primary_phone', unique: true })
+  @Column({ unique: true })
   primaryPhone: string;
 
-  @Column({ name: 'alternate_phones', type: 'jsonb', nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   alternatePhones?: string[];
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   address?: string;
 
-  @OneToMany('Vehicle', (vehicle: any) => vehicle.customer)
-  vehicles: any[];
+  @OneToMany(() => Vehicle, vehicle => vehicle.customer)
+  vehicles: Vehicle[];
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 }

@@ -11,43 +11,43 @@ async function bootstrap() {
         const usersService = app.get(users_service_1.UsersService);
         const testUsers = [
             {
-                username: 'admin',
-                password: 'password',
+                username: 'admin'.toLowerCase(),
+                passwordHash: 'password',
                 fullName: 'Administrator',
                 email: 'admin@adwita.com',
                 role: user_role_enum_1.UserRole.ADMIN,
             },
             {
-                username: 'operator',
-                password: 'password',
+                username: 'operator'.toLowerCase(),
+                passwordHash: 'password',
                 fullName: 'System Operator',
                 email: 'operator@adwita.com',
                 role: user_role_enum_1.UserRole.OPERATOR,
             },
             {
-                username: 'supervisor',
-                password: 'password',
+                username: 'supervisor'.toLowerCase(),
+                passwordHash: 'password',
                 fullName: 'Field Supervisor',
                 email: 'supervisor@adwita.com',
                 role: user_role_enum_1.UserRole.SUPERVISOR,
             },
             {
-                username: 'tech',
-                password: 'password',
+                username: 'tech'.toLowerCase(),
+                passwordHash: 'password',
                 fullName: 'Field Technician',
                 email: 'tech@adwita.com',
                 role: user_role_enum_1.UserRole.TECHNICIAN,
             },
             {
-                username: 'manufacturer',
-                password: 'password',
+                username: 'manufacturer'.toLowerCase(),
+                passwordHash: 'password',
                 fullName: 'Equipment Manufacturer',
                 email: 'manufacturer@adwita.com',
                 role: user_role_enum_1.UserRole.MANUFACTURER,
             },
             {
-                username: 'warehouse',
-                password: 'password',
+                username: 'warehouse'.toLowerCase(),
+                passwordHash: 'password',
                 fullName: 'Warehouse Manager',
                 email: 'warehouse@adwita.com',
                 role: user_role_enum_1.UserRole.MANUFACTURER_WAREHOUSE,
@@ -62,7 +62,13 @@ async function bootstrap() {
                     console.log(`User '${userData.username}' already exists. Skipping.`);
                     continue;
                 }
-                await usersService.create(userData);
+                await usersService.create({
+                    username: userData.username,
+                    email: userData.email,
+                    fullName: userData.fullName,
+                    role: userData.role,
+                    passwordHash: userData.passwordHash,
+                });
                 console.log(`✅ User '${userData.username}' (${userData.role}) created successfully!`);
             }
             catch (error) {

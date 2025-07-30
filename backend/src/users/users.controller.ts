@@ -1,9 +1,10 @@
-import { Controller, Post, Body, ValidationPipe, Get, Query, UseGuards, BadRequestException, Patch, Param } from '@nestjs/common';
+import { Controller, Post, Body, ValidationPipe, Get, Query, UseGuards, BadRequestException, Patch, Param, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './create-user.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../common/roles.guard';
-import { Roles } from '../common/roles.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../common/enums/user-role.enum';
 
 @Controller('users')
@@ -33,8 +34,8 @@ export class UsersController {
 
   @Patch(':id')
   @Roles(UserRole.ADMIN)
-  update(@Param('id') id: string, @Body(new ValidationPipe()) updateData: Partial<CreateUserDto>) {
-    return this.usersService.update(+id, updateData);
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(+id, updateUserDto);
   }
 
   @Get(':id')

@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
 import { UsersService } from '../users/users.service';
-import { CreateUserDto } from '../users/create-user.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UserRole } from '../common/enums/user-role.enum';
+import * as bcrypt from 'bcrypt';
 
 async function bootstrap() {
   // Create a standalone application context
@@ -13,45 +14,45 @@ async function bootstrap() {
     const usersService = app.get(UsersService);
 
     // Define test users for all roles
-    const testUsers: CreateUserDto[] = [
+    const testUsers = [
       {
-        username: 'admin',
-        password: 'password',
+        username: 'admin'.toLowerCase(),
+        passwordHash: 'password',
         fullName: 'Administrator',
         email: 'admin@adwita.com',
         role: UserRole.ADMIN,
       },
       {
-        username: 'operator',
-        password: 'password',
+        username: 'operator'.toLowerCase(),
+        passwordHash: 'password',
         fullName: 'System Operator',
         email: 'operator@adwita.com',
         role: UserRole.OPERATOR,
       },
       {
-        username: 'supervisor',
-        password: 'password',
+        username: 'supervisor'.toLowerCase(),
+        passwordHash: 'password',
         fullName: 'Field Supervisor',
         email: 'supervisor@adwita.com',
         role: UserRole.SUPERVISOR,
       },
       {
-        username: 'tech',
-        password: 'password',
+        username: 'tech'.toLowerCase(),
+        passwordHash: 'password',
         fullName: 'Field Technician',
         email: 'tech@adwita.com',
         role: UserRole.TECHNICIAN,
       },
       {
-        username: 'manufacturer',
-        password: 'password',
+        username: 'manufacturer'.toLowerCase(),
+        passwordHash: 'password',
         fullName: 'Equipment Manufacturer',
         email: 'manufacturer@adwita.com',
         role: UserRole.MANUFACTURER,
       },
       {
-        username: 'warehouse',
-        password: 'password',
+        username: 'warehouse'.toLowerCase(),
+        passwordHash: 'password',
         fullName: 'Warehouse Manager',
         email: 'warehouse@adwita.com',
         role: UserRole.MANUFACTURER_WAREHOUSE,
@@ -70,7 +71,13 @@ async function bootstrap() {
           continue;
         }
 
-        await usersService.create(userData);
+        await usersService.create({
+          username: userData.username,
+          email: userData.email,
+          fullName: userData.fullName,
+          role: userData.role,
+          passwordHash: userData.passwordHash, // Pass plain text password to be hashed by service
+        });
         console.log(`✅ User '${userData.username}' (${userData.role}) created successfully!`);
       } catch (error) {
         console.error(`Error creating user '${userData.username}':`, error.message);

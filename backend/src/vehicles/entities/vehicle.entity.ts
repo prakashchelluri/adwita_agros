@@ -50,6 +50,15 @@ export class Vehicle {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
+  @Column()
+  make: string;
+
+  @Column()
+  model: string;
+
+  @Column()
+  year: number;
+
   // Method to check if warranty is still valid
   isUnderWarranty(): boolean {
     if (!this.isWarrantyActive) return false;

@@ -15,5 +15,5 @@ export declare class ServiceRequestsService {
     findOne(id: number): Promise<ServiceRequest>;
     update(id: number, updateServiceRequestDto: UpdateServiceRequestDto): Promise<ServiceRequest>;
     remove(id: number): Promise<void>;
-    updateApprovalStatus(id: number, request: ServiceRequest): Promise<import("typeorm").UpdateResult>;
+    updateApprovalStatus(id: number, updateData: Partial<ServiceRequest>): Promise<ServiceRequest>;
 }

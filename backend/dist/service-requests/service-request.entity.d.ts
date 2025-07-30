@@ -1,3 +1,7 @@
+import { Customer } from '../customers/customer.entity';
+import { Vehicle } from '../vehicles/entities/vehicle.entity';
+import { ServiceRequestPartUsed } from './service-request-part-used.entity';
+import { User } from '../users/user.entity';
 export declare enum RequestStatus {
     NEW = "new",
     AWAITING_APPROVAL = "awaiting_approval",
@@ -18,9 +22,9 @@ export declare enum RequestType {
 export declare class ServiceRequest {
     id: number;
     ticketNumber: string;
-    customer: any;
-    vehicle: any;
-    partsUsed: any[];
+    customer: Customer;
+    vehicle: Vehicle;
+    partsUsed: ServiceRequestPartUsed[];
     type: RequestType;
     issueDescription: string;
     customerLocation: string;
@@ -29,7 +33,7 @@ export declare class ServiceRequest {
     isWarrantyEligible: boolean;
     manufacturerApprovalStatus: RequestStatus;
     manufacturerApprovalNotes: string;
-    assignedTechnician: any;
+    assignedTechnician: User;
     createdAt: Date;
     updatedAt: Date;
     completedAt: Date;

@@ -11,6 +11,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServiceRequest = exports.RequestType = exports.RequestStatus = void 0;
 const typeorm_1 = require("typeorm");
+const customer_entity_1 = require("../customers/customer.entity");
+const vehicle_entity_1 = require("../vehicles/entities/vehicle.entity");
+const service_request_part_used_entity_1 = require("./service-request-part-used.entity");
+const user_entity_1 = require("../users/user.entity");
 var RequestStatus;
 (function (RequestStatus) {
     RequestStatus["NEW"] = "new";
@@ -44,15 +48,15 @@ __decorate([
 __decorate([
     (0, typeorm_1.ManyToOne)('Customer', { eager: true }),
     (0, typeorm_1.JoinColumn)({ name: 'customer_id' }),
-    __metadata("design:type", Object)
+    __metadata("design:type", customer_entity_1.Customer)
 ], ServiceRequest.prototype, "customer", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)('Vehicle', { eager: true }),
     (0, typeorm_1.JoinColumn)({ name: 'vehicle_id' }),
-    __metadata("design:type", Object)
+    __metadata("design:type", vehicle_entity_1.Vehicle)
 ], ServiceRequest.prototype, "vehicle", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)('ServiceRequestPartUsed', 'serviceRequest', { eager: true }),
+    (0, typeorm_1.OneToMany)(() => service_request_part_used_entity_1.ServiceRequestPartUsed, (partUsed) => partUsed.serviceRequest, { eager: true, cascade: true }),
     __metadata("design:type", Array)
 ], ServiceRequest.prototype, "partsUsed", void 0);
 __decorate([
@@ -90,7 +94,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.ManyToOne)('User', { nullable: true, eager: true }),
     (0, typeorm_1.JoinColumn)({ name: 'assigned_technician_id' }),
-    __metadata("design:type", Object)
+    __metadata("design:type", user_entity_1.User)
 ], ServiceRequest.prototype, "assignedTechnician", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),

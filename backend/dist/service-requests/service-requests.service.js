@@ -37,7 +37,29 @@ let ServiceRequestsService = class ServiceRequestsService {
         return `SR-${year}${month}${day}-${random}`;
     }
     async findAll(query) {
-        return this.serviceRequestRepository.find();
+        const { status, type, isWarrantyEligible, assignedTechnicianId, customerId, vehicleId, search, page = 1, limit = 20 } = query;
+        const qb = this.serviceRequestRepository.createQueryBuilder('request');
+        qb.leftJoinAndSelect('request.customer', 'customer')
+            .leftJoinAndSelect('request.vehicle', 'vehicle')
+            .leftJoinAndSelect('request.assignedTechnician', 'assignedTechnician');
+        if (status)
+            qb.andWhere('request.status = :status', { status });
+        if (type)
+            qb.andWhere('request.type = :type', { type });
+        if (isWarrantyEligible !== undefined)
+            qb.andWhere('request.isWarrantyEligible = :isWarrantyEligible', { isWarrantyEligible });
+        if (assignedTechnicianId)
+            qb.andWhere('request.assignedTechnicianId = :assignedTechnicianId', { assignedTechnicianId });
+        if (customerId)
+            qb.andWhere('request.customerId = :customerId', { customerId });
+        if (vehicleId)
+            qb.andWhere('request.vehicleId = :vehicleId', { vehicleId });
+        if (search) {
+            qb.andWhere('(request.ticketNumber LIKE :search OR request.description LIKE :search OR customer.name LIKE :search OR vehicle.licensePlate LIKE :search)', { search: `%${search}%` });
+        }
+        const skip = (page - 1) * limit;
+        qb.skip(skip).take(limit);
+        return qb.getMany();
     }
     async findPublicRequests(query) {
         return this.serviceRequestRepository.find();
@@ -71,10 +93,13 @@ let ServiceRequestsService = class ServiceRequestsService {
             throw new common_1.NotFoundException(`Service request with ID ${id} not found`);
         }
     }
-    async updateApprovalStatus(id, request) {
-        return this.serviceRequestRepository.update(id, {
-            manufacturerApprovalStatus: request.manufacturerApprovalStatus
-        });
+    async updateApprovalStatus(id, updateData) {
+        await this.serviceRequestRepository.update(id, updateData);
+        const updatedRequest = await this.serviceRequestRepository.findOne({ where: { id } });
+        if (!updatedRequest) {
+            throw new common_1.NotFoundException(`Service request with ID ${id} not found`);
+        }
+        return updatedRequest;
     }
 };
 exports.ServiceRequestsService = ServiceRequestsService;
